@@ -1,0 +1,56 @@
+package dev.esteban.springcloudgateway;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import static io.micrometer.core.instrument.binder.jetty.JettyClientKeyValues.uri;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
+public class SpringCloudGatewayApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringCloudGatewayApplication.class, args);
+    }
+
+    @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route("rental-service", r -> r.path("/rental/**")
+                        .filters(f -> f
+                                .prefixPath("/api")
+                                .addResponseHeader("x-Powered-By", "Esteban's API")
+                        )
+                        .uri("lb://rental")
+                )
+                .route("security-auth-service", r -> r.path("/auth/**")
+                        .filters(f -> f
+                                .prefixPath("/api")
+                                .addResponseHeader("x-Powered-By", "Esteban's API")
+                        )
+                        .uri("lb://security")
+                )
+                .route("security-user-service", r -> r.path("/user/**")
+                        .filters(f -> f
+                                .prefixPath("/api")
+                                .addResponseHeader("x-Powered-By", "Esteban's API")
+                        )
+                        .uri("lb://security")
+                )
+                .build();
+    }
+
+    @Bean
+    public WebClient.Builder webClientBuilder(ReactorLoadBalancerExchangeFilterFunction rbf) {
+        return WebClient.builder()
+                .filter(rbf);
+    }
+}
