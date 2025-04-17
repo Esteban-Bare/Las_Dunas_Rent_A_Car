@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Front-Dunas/Front-Dunas.iml" filepath="$PROJECT_DIR$/Front-Dunas/Front-Dunas.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Las_Dunas_Rent_A_Car.iml" filepath="$PROJECT_DIR$/.idea/Las_Dunas_Rent_A_Car.iml" />
     </modules>
   </component>
