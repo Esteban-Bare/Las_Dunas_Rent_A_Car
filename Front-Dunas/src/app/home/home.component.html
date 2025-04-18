@@ -1,1 +1,14 @@
-<p>home works!</p>
+<main>
+  <h1>
+    this is the home page
+  </h1>
+  <div>
+    @if (this.AuthService.isLoggedIn()) {
+      <p>connected</p>
+      @if (this.AuthService.getRole() == 'ADMIN') {
+        <p>Welcome Back Admin</p>
+      }
+    }
+    <button (click)="AuthService.login(AuthService.tempCreds)">asaasaasa</button>
+  </div>
+</main>

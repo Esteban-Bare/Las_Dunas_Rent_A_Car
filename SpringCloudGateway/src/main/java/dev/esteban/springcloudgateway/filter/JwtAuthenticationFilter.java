@@ -4,6 +4,7 @@ import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -22,7 +23,8 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     private final List<String> excludedPaths = List.of(
             "/api/auth/login",
             "/api/auth/register",
-            "/api/auth/refresh-token"
+            "/api/auth/refresh-token",
+            "/api/auth/logout"
     );
 
     @Autowired
@@ -35,11 +37,10 @@ public class JwtAuthenticationFilter implements GlobalFilter {
         ServerHttpRequest request = exchange.getRequest();
 
         if (isSecured(request)) {
-            if (isAuthMissing(request)) {
+            String token = extractTokenFromCookies(request);
+            if (token == null) {
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
-
-            final String token = extractToken(request);
 
             return isValidToken(token, exchange)
                     .flatMap(isValid -> {
@@ -51,6 +52,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
                         ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
                                 .header("X-User-Role", exchange.getAttribute("USER_ROLE").toString())
                                 .header("X-User-Email", exchange.getAttribute("USER_EMAIL").toString())
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                                 .build();
 
                         return chain.filter(exchange.mutate().request(modifiedRequest).build());
@@ -58,6 +60,11 @@ public class JwtAuthenticationFilter implements GlobalFilter {
         }
 
         return chain.filter(exchange);
+    }
+
+    private String extractTokenFromCookies(ServerHttpRequest request) {
+        HttpCookie cookie = request.getCookies().getFirst("JWT");
+        return cookie != null ? cookie.getValue() : null;
     }
 
     private Mono<Boolean> isValidToken(String token, ServerWebExchange exchange) {
@@ -86,25 +93,12 @@ public class JwtAuthenticationFilter implements GlobalFilter {
                 });
     }
 
-    private String extractToken(ServerHttpRequest request) {
-        String authHeader = getAuthHeader(request);
-        return authHeader.substring(7); // Retire le préfixe "Bearer "
-    }
-
-    private String getAuthHeader(ServerHttpRequest request) {
-        return request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-    }
-
     private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
         return response.setComplete();
     }
 
-    private boolean isAuthMissing(ServerHttpRequest request) {
-        String authHeader = getAuthHeader(request);
-        return authHeader == null || !authHeader.startsWith("Bearer ");
-    }
 
     private boolean isSecured(ServerHttpRequest request) {
         String path = request.getURI().getPath();

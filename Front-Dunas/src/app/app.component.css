@@ -1,0 +1,56 @@
+:root {
+  --primary-color: #333333;
+  --secondary-color: #9ECAE1;
+  --light-color: #f8f9fa;
+  --dark-color: #212529;
+  --grey-color: #6c757d;
+  --light-grey: #e9ecef;
+}
+
+/* Personnalisation de l'en-tête */
+.navbar {
+  background-color: var(--primary-color) !important; /* Remplace le bg-primary */
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  transition: transform 0.3s ease;
+  color: var(--light-color) !important;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+  color: var(--secondary-color) !important;
+}
+
+.nav-link {
+  font-weight: 500;
+  margin: 0 0.2rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  color: var(--light-color) !important;
+}
+
+.nav-link:hover {
+  background-color: rgba(158, 202, 225, 0.2);
+  transform: translateY(-2px);
+  color: var(--secondary-color) !important;
+}
+
+.nav-link.active {
+  background-color: rgba(158, 202, 225, 0.25);
+  color: var(--secondary-color) !important;
+}
+
+/* Adaptation mobile */
+@media (max-width: 991px) {
+  .navbar-nav {
+    margin-top: 1rem;
+  }
+
+  .nav-link {
+    margin: 0.2rem 0;
+  }
+}
