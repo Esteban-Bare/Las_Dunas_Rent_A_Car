@@ -12,7 +12,7 @@
         <module name="Eureka" />
         <module name="Ms-Promo" />
       </profile>
-      <profile name="Annotation profile for Ms-Rental" enabled="true">
+      <profile name="Annotation profile for Ms-Comments" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -20,6 +20,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="Ms-Security" />
+        <module name="Ms-Comments" />
         <module name="Ms-Rental" />
       </profile>
     </annotationProcessing>
@@ -27,6 +28,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Eureka" options="-parameters" />
+      <module name="Ms-Comments" options="-parameters" />
       <module name="Ms-Promo" options="-parameters" />
       <module name="Ms-Rental" options="-parameters" />
       <module name="Ms-Security" options="-parameters" />
