@@ -10,8 +10,6 @@ import java.util.List;
 public interface PromotionRepository extends MongoRepository<Promotion, String> {
     Promotion findByPromoId(String promoId);
 
-    Promotion findByVehicleId(String vehicleId);
-
     void deleteByPromoId(String promoId);
 
     List<Promotion> findPromotionsByVehicleId(String vehicleId);
