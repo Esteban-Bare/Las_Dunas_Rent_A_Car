@@ -10,14 +10,5 @@ import { AuthService } from '../service/auth.service';
 export class HomeComponent {
   myVar: string = "Hello World";
 
-  constructor(public AuthService: AuthService) {}
-  // ngOnInit() {
-  //   this.AuthService.login(this.AuthService.tempCreds)
-  //     .then((userData) => {
-  //       console.log("User Info:", userData);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Login error:", error);
-  //     });
-  // }
+  constructor() {}
 }

@@ -1,13 +1,12 @@
 package dev.esteban.mssecurity.controller;
 
+import dev.esteban.mssecurity.model.User;
+import dev.esteban.mssecurity.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +14,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class JwtValidationController {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private JwtDecoder jwtDecoder;
@@ -34,6 +36,26 @@ public class JwtValidationController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.ok(Map.of("valid", false, "error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/can-access/{resource}")
+    public ResponseEntity<?> canAccess(@RequestHeader("X-User-Email") String email, @PathVariable String resource) {
+        System.out.println("Checking access for path: " + resource);
+        try {
+            User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+            boolean isAuthorized = switch (resource) {
+                case "manager-backoffice" ->
+                        user.getRole().toString().equals("MANAGER") || user.getRole().toString().equals("ADMIN");
+                case "admin-backoffice" ->
+                        user.getRole().toString().equals("ADMIN");
+                default -> false;
+            };
+
+            return ResponseEntity.ok(Map.of("authorized", isAuthorized));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("authorized", false, "error", e.getMessage()));
         }
     }
 }

@@ -56,12 +56,12 @@ public class LoginController {
     public ResponseEntity<?> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("JWT", null);
         cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(0);
 
         response.addCookie(cookie);
-
+        System.out.println("Logout successful");
         return ResponseEntity.ok(Map.of("message", "Logout successful"));
     }
 }
