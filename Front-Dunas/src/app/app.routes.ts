@@ -1,6 +1,16 @@
 import { Routes } from '@angular/router';
 import {HomeComponent} from './home/home.component';
+import {DashboardComponent} from './dashboard/dashboard.component';
+import {BackofficeComponent} from './backoffice/backoffice.component';
+import {LoginComponent} from './login/login.component';
+import {UnauthorizedComponent} from './unauthorized/unauthorized.component';
+import {AuthGuard} from './guard/auth.guard';
 
 export const routes: Routes = [
-  {path: "", component: HomeComponent}
+  {path: "", component: HomeComponent},
+  {path: "dashboard", component: DashboardComponent, canActivate: [AuthGuard]},
+  {path: "backoffice", component:BackofficeComponent,canActivate: [AuthGuard], data : { role: 'manager', resource: 'manager-backoffice' } },
+  {path: "login", component: LoginComponent},
+  {path: "admin/backoffice", component: BackofficeComponent,canActivate: [AuthGuard], data : { role: 'admin', resource: 'admin-backoffice' } },
+  {path: "unauthorized", component: UnauthorizedComponent}
 ];

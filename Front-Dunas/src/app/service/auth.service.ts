@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {Credentials} from '../interface/credentials';
 import { UserInfo } from '../interface/user-info';
 import {BehaviorSubject, Observable} from 'rxjs';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +12,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
   public currentUser$: Observable<UserInfo | null> = this.currentUserSubject.asObservable();
 
-  public tempCreds: Credentials = {
-    email : "admin@gmail.com",
-    password : "123456"
-  }
-
-  constructor() {
+  constructor(private router: Router) {
     const savedUserInfo = localStorage.getItem(this.USER_INFO_KEY);
     if (savedUserInfo) {
       this.currentUserSubject.next(JSON.parse(savedUserInfo));
@@ -60,6 +56,8 @@ export class AuthService {
         method: "POST",
         credentials: 'include'
       });
+      console.log("Logout successful");
+      this.router.navigate(['/']);
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {
@@ -69,7 +67,32 @@ export class AuthService {
   }
 
   public isLoggedIn(): boolean {
-    return this.currentUserSubject.next !== null;
+    return this.currentUserSubject.value !== null;
+  }
+
+  public async checkAuthStatus(): Promise<boolean> {
+    console.log("Checking auth status...");
+    try {
+      if (!this.currentUserSubject.value) {
+        return false;
+      }
+
+      const res = await fetch("http://localhost:8077/auth/validate",
+        {
+          method: "POST",
+          credentials: "include"
+        });
+
+      if (!res.ok) {
+        this.logout();
+        return false;
+      }
+
+      return true
+    } catch (e) {
+      console.error("Error during auth status check:", e);
+      return false;
+    }
   }
 
   private setUserInfo(userInfo: UserInfo): void {
