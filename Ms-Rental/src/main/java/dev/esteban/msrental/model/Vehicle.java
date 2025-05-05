@@ -1,17 +1,17 @@
 package dev.esteban.msrental.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import dev.esteban.msrental.enums.StatusVehicle;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Vehicle {
@@ -22,15 +22,15 @@ public class Vehicle {
     @Column(nullable = false)
     private String model;
 
-    @Column(nullable = false)
-    private String plate_number;
+    @Column(name = "plateNumber", nullable = false)
+    private String plateNumber;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusVehicle status;
 
-    @Column(precision = 10, scale = 2)
-    private BigDecimal price_per_day;
+    @Column(name = "price_par_day", precision = 10, scale = 2)
+    private BigDecimal pricePerDay;
 
     @ManyToOne
     @JoinColumn(name = "brand_id", nullable = false)
@@ -45,12 +45,18 @@ public class Vehicle {
     @OneToMany(mappedBy = "vehicle")
     private Set<Reservation> reservations;
 
-    public Vehicle(String model, String plate_number, BigDecimal price_per_day,StatusVehicle status,Brand brand, Category category) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false)
+    @JsonBackReference
+    private Store store;
+
+    public Vehicle(String model, String plateNumber, BigDecimal pricePerDay,StatusVehicle status,Brand brand, Category category, Store store) {
         this.model = model;
-        this.plate_number = plate_number;
-        this.price_per_day = price_per_day;
+        this.plateNumber = plateNumber;
+        this.pricePerDay = pricePerDay;
         this.status = status;
         this.brand = brand;
         this.category = category;
+        this.store = store;
     }
 }

@@ -2,17 +2,18 @@ package dev.esteban.msrental.model;
 
 import dev.esteban.msrental.enums.RentalStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Rental {
@@ -31,18 +32,17 @@ public class Rental {
     private Vehicle vehicle;
 
     @ManyToOne
-    @JoinColumn(name = "store_start_id", nullable = false)
-    private Store storeStart;
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
-    @ManyToOne
-    @JoinColumn(name = "store_end_id")
-    private Store storeEnd;
-
-    @Column(nullable = false)
-    private LocalDate startDate;
+    @OneToMany(mappedBy = "rental")
+    private Set<Payment> payments;
 
     @Column(nullable = false)
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+
+    @Column(nullable = false)
+    private LocalDateTime endDate;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -52,8 +52,8 @@ public class Rental {
     private BigDecimal totalPrice;
 
     @Column(nullable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 }

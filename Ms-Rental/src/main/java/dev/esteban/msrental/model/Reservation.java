@@ -1,16 +1,18 @@
 package dev.esteban.msrental.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import dev.esteban.msrental.enums.ReservationStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Reservation {
@@ -28,15 +30,24 @@ public class Reservation {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @Column(nullable = false)
-    private LocalDate requested_start_date;
+    @OneToMany(mappedBy = "reservation")
+    private Set<Payment> payments;
 
     @Column(nullable = false)
-    private LocalDate requested_end_date;
+    private LocalDateTime requested_start_date;
+
+    @Column(nullable = false)
+    private LocalDateTime requested_end_date;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    @Column(nullable = false)
+    private BigDecimal reservationPrice;
+
+    @Column(nullable = false)
+    private BigDecimal insuranceRefundPrice;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private Set<Rental> rentals;

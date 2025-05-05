@@ -1,14 +1,13 @@
 package dev.esteban.msrental.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Setter
+@Getter
 @Table(name = "store_managers")
 public class StoreManager {
     @Id

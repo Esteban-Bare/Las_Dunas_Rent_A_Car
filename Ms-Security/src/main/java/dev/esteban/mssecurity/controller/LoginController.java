@@ -9,10 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,5 +60,16 @@ public class LoginController {
         response.addCookie(cookie);
         System.out.println("Logout successful");
         return ResponseEntity.ok(Map.of("message", "Logout successful"));
+    }
+
+    @PostMapping("/check-header-bearer")
+    public ResponseEntity<?> checkHeaderBearer(@RequestHeader("Authorization") String token) {
+        // I need to see if the header bearer token is present and return it in the response
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of("error", "No token provided"));
+        }
+        // I dont need to decode the token, just return it
+        String jwt = token.replace("Bearer ", "");
+        return ResponseEntity.ok(Map.of("token", jwt));
     }
 }
