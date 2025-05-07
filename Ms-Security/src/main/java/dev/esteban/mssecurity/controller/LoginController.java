@@ -2,9 +2,11 @@ package dev.esteban.mssecurity.controller;
 
 import dev.esteban.mssecurity.dto.JwtJson;
 import dev.esteban.mssecurity.dto.UserLogDto;
+import dev.esteban.mssecurity.dto.UserRegisterDTO;
 import dev.esteban.mssecurity.model.User;
 import dev.esteban.mssecurity.repository.UserRepository;
 import dev.esteban.mssecurity.service.JWTService;
+import dev.esteban.mssecurity.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class LoginController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLogDto info, HttpServletResponse response) {
@@ -71,5 +76,15 @@ public class LoginController {
         // I dont need to decode the token, just return it
         String jwt = token.replace("Bearer ", "");
         return ResponseEntity.ok(Map.of("token", jwt));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserRegisterDTO user) {
+        ResponseEntity<?> response = userService.registerUser(user);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+        } else {
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+        }
     }
 }
