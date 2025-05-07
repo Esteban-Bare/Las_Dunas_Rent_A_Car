@@ -25,4 +25,6 @@ public class UserController {
     public User getUserById(@PathVariable Long id) {
         return userRepository.findById(id).orElse(null);
     }
+
+
 }

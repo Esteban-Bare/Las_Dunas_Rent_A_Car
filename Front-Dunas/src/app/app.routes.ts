@@ -5,6 +5,7 @@ import {BackofficeComponent} from './backoffice/backoffice.component';
 import {LoginComponent} from './login/login.component';
 import {UnauthorizedComponent} from './unauthorized/unauthorized.component';
 import {AuthGuard} from './guard/auth.guard';
+import {RegisterComponent} from './register/register.component';
 
 export const routes: Routes = [
   {path: "", component: HomeComponent},
@@ -12,5 +13,6 @@ export const routes: Routes = [
   {path: "backoffice", component:BackofficeComponent,canActivate: [AuthGuard], data : { role: 'manager', resource: 'manager-backoffice' } },
   {path: "login", component: LoginComponent},
   {path: "admin/backoffice", component: BackofficeComponent,canActivate: [AuthGuard], data : { role: 'admin', resource: 'admin-backoffice' } },
-  {path: "unauthorized", component: UnauthorizedComponent}
+  {path: "unauthorized", component: UnauthorizedComponent},
+  {path: "register", component: RegisterComponent}
 ];

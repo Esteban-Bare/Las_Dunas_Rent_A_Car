@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Credentials} from '../interface/credentials';
 import { UserInfo } from '../interface/user-info';
+import {RegisterData} from '../interface/register-data';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Router} from '@angular/router';
 
@@ -110,5 +111,29 @@ export class AuthService {
 
   public getEmail(): string | null {
     return this.currentUserSubject.value?.email || null;
+  }
+
+  async register(registerData: RegisterData) {
+    try {
+      const res = await fetch("http://localhost:8077/auth/register", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(registerData),
+        credentials: 'include'
+      });
+      console.log(res);
+
+      if (!res.ok) {
+        throw new Error("Registration failed");
+      }
+
+      const data = await res.json();
+      console.log(data);
+    } catch (error) {
+      console.error("Error during registration:", error);
+      throw error;
+    }
   }
 }
