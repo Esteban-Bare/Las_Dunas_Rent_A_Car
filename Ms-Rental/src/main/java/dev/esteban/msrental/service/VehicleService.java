@@ -1,12 +1,11 @@
 package dev.esteban.msrental.service;
 
-import dev.esteban.msrental.dto.AvailableVehicleDto;
-import dev.esteban.msrental.dto.VehicleDto;
-import dev.esteban.msrental.dto.VehicleSearchDto;
+import dev.esteban.msrental.dto.*;
 import dev.esteban.msrental.enums.StatusVehicle;
 import dev.esteban.msrental.model.Store;
 import dev.esteban.msrental.model.Vehicle;
 import dev.esteban.msrental.repository.VehicleRepository;
+import dev.esteban.msrental.service.client.MsPricingFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,9 @@ public class VehicleService {
     @Autowired
     private StoreService storeService;
 
+    @Autowired
+    private MsPricingFeignClient msPricingFeignClient;
+
 
     public ResponseEntity<?>  getAvailableCars(VehicleSearchDto vehicleSearchDto) {
         List<Store> stores = storeService.getStoresByCity(vehicleSearchDto.getCity());
@@ -39,7 +41,14 @@ public class VehicleService {
                 boolean isAvailable = vehicleIsAvailable(vehicle);
                 boolean isReserved = vehicleIsReservedBetweenTwoDates(vehicle, vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour());
                 return isAvailable && !isReserved;
-            }).map(vehicle -> new VehicleDto(vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay()))
+            }).map(vehicle -> {
+                    ResponseEntity<PriceDto> response = msPricingFeignClient.getPricesByCar(new VehiclePriceDto(vehicle.getId(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour()));
+                    if (response.getStatusCode().isError()) {
+                        return null;
+                    }
+                    PriceDto pricesDto = response.getBody();
+                    return new VehicleDto(vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), pricesDto);
+                    })
                     .collect(Collectors.toList());
             storeVehicles.put(store.getName(), vehicles);
         });

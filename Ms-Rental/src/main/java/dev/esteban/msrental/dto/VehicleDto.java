@@ -14,4 +14,5 @@ public class VehicleDto {
     private String brand;
     private String category;
     private BigDecimal pricePerDay;
+    private PriceDto priceDto;
 }
