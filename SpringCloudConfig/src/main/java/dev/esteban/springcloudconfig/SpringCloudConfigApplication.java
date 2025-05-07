@@ -10,7 +10,7 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 public class SpringCloudConfigApplication {
     static {
         try {
-            String userDir = System.getProperty("user.dir");
+            String userDir = System.getProperty("user.dir") + "/env";
             Dotenv dotenv = Dotenv.configure()
                     .directory(userDir)
                     .load();
