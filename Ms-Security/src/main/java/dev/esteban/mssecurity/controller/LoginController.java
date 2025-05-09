@@ -35,6 +35,7 @@ public class LoginController {
             String token = jwtService.createJwtToken(info);
 
             User user = userRepository.findByEmail(info.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+
             Cookie cookie = new Cookie("JWT", token);
             cookie.setHttpOnly(true);
             cookie.setSecure(true);
@@ -48,9 +49,11 @@ public class LoginController {
             userInfo.put("role", user.getRole());
 
             return ResponseEntity.ok(userInfo);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
         }
         catch (Exception e) {
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(401).body(Map.of("error", "Problem during login"));
         }
     }
 
