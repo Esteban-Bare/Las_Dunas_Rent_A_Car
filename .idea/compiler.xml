@@ -12,7 +12,7 @@
         <module name="Eureka" />
         <module name="Ms-Promo" />
       </profile>
-      <profile name="Annotation profile for Ms-Pricing" enabled="true">
+      <profile name="Annotation profile for Ms-Security" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
