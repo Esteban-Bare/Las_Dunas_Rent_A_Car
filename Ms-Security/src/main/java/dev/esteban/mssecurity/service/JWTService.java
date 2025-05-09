@@ -29,10 +29,10 @@ public class JWTService {
         this.jwtEncoder = jwtEncoder;
     }
     public String createJwtToken(UserLogDto info) {
+        User user = userRepository.findByEmail(info.getEmail()).orElseThrow(() -> new RuntimeException("Email not found"));
         if (!isValidUser(info)) {
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("Password is incorrect");
         }
-        User user = userRepository.findByEmail(info.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
