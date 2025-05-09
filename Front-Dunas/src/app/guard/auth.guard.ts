@@ -14,14 +14,12 @@ export class AuthGuard implements CanActivate {
       this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
       return false;
     }
-    console.log("Pass 1° if");
 
     const isValid = await this.authService.checkAuthStatus();
     if (!isValid) {
       this.router.navigate(['/login']);
       return false;
     }
-    console.log("Pass 2° if");
 
     if (route.data['resource']) {
       const hasAccess = await this.authorizationService.canAccess(route.data['resource']);
@@ -30,7 +28,6 @@ export class AuthGuard implements CanActivate {
         return false;
       }
     }
-    console.log("Pass 3° if");
 
     return true;
   }
