@@ -7,6 +7,7 @@ import {UnauthorizedComponent} from './unauthorized/unauthorized.component';
 import {AuthGuard} from './guard/auth.guard';
 import {LoggedGuard} from './guard/logged.guard';
 import {RegisterComponent} from './register/register.component';
+import {ReservationComponent} from './reservation/reservation.component';
 
 export const routes: Routes = [
   {path: "", component: HomeComponent},
@@ -15,5 +16,6 @@ export const routes: Routes = [
   {path: "login", component: LoginComponent, canActivate: [LoggedGuard]},
   {path: "admin/backoffice", component: BackofficeComponent,canActivate: [AuthGuard], data : { role: 'admin', resource: 'admin-backoffice' } },
   {path: "unauthorized", component: UnauthorizedComponent},
-  {path: "register", component: RegisterComponent, canActivate: [LoggedGuard]}
+  {path: "register", component: RegisterComponent, canActivate: [LoggedGuard]},
+  {path: "reservations", component: ReservationComponent}
 ];

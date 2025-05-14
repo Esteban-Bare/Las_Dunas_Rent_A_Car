@@ -9,7 +9,6 @@ import dev.esteban.msrental.service.client.MsPricingFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -42,13 +41,18 @@ public class VehicleService {
                 boolean isReserved = vehicleIsReservedBetweenTwoDates(vehicle, vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour());
                 return isAvailable && !isReserved;
             }).map(vehicle -> {
+                try {
                     ResponseEntity<PriceDto> response = msPricingFeignClient.getPricesByCar(new VehiclePriceDto(vehicle.getId(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour()));
-                    if (response.getStatusCode().isError()) {
-                        return null;
+                    if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                        PriceDto pricesDto = response.getBody();
+                        return new VehicleDto(vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), pricesDto);
+                    } else {
+                        return new VehicleDto(vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), null);
                     }
-                    PriceDto pricesDto = response.getBody();
-                    return new VehicleDto(vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), pricesDto);
-                    })
+                } catch (Exception e) {
+                    return new VehicleDto(vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), null);
+                }})
+//            .filter(vehicleDto -> vehicleDto.getPriceDto() != null)
                     .collect(Collectors.toList());
             storeVehicles.put(store.getName(), vehicles);
         });

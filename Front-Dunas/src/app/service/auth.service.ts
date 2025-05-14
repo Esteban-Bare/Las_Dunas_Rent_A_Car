@@ -13,10 +13,17 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
   public currentUser$: Observable<UserInfo | null> = this.currentUserSubject.asObservable();
 
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+
   constructor(private router: Router) {
     const savedUserInfo = localStorage.getItem(this.USER_INFO_KEY);
     if (savedUserInfo) {
       this.currentUserSubject.next(JSON.parse(savedUserInfo));
+
+      this.checkAuthStatus().then(isValid => {
+        this.isAuthenticatedSubject.next(isValid);
+      })
     }
   }
 
@@ -44,6 +51,7 @@ export class AuthService {
       }
 
       this.setUserInfo(userInfo);
+      this.isAuthenticatedSubject.next(true);
       return userInfo;
     } catch (error) {
       console.error("Error during login:", error);
@@ -64,17 +72,19 @@ export class AuthService {
     } finally {
       localStorage.removeItem(this.USER_INFO_KEY);
       this.currentUserSubject.next(null);
+      this.isAuthenticatedSubject.next(false);
     }
   }
 
   public isLoggedIn(): boolean {
-    return this.currentUserSubject.value !== null;
+    return this.isAuthenticatedSubject.value
   }
 
   public async checkAuthStatus(): Promise<boolean> {
     console.log("Checking auth status...");
     try {
       if (!this.currentUserSubject.value) {
+        this.isAuthenticatedSubject.next(false)
         return false;
       }
 
@@ -86,9 +96,11 @@ export class AuthService {
 
       if (!res.ok) {
         this.logout();
+        this.isAuthenticatedSubject.next(false)
         return false;
       }
 
+      this.isAuthenticatedSubject.next(true);
       return true
     } catch (e) {
       console.error("Error during auth status check:", e);

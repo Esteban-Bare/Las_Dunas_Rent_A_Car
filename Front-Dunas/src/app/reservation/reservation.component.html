@@ -1,0 +1,81 @@
+@if (authService.isAuthenticated$ | async) {
+  <h3>Make a reservation</h3>
+
+  <form [formGroup]="availableCarsForm" (ngSubmit)="searchAvailableCars()">
+    <div class="form-group">
+      <label for="city">City</label>
+      <select id="city" formControlName="city" class="form-control">
+        <option value="">Select a city</option>
+        <option value="toulon">Toulon</option>
+        <option value="marseille">Marseille</option>
+        <option value="nice">Nice</option>
+        <option value="paris">Paris</option>
+      </select>
+      @if (availableCarsForm.get('city')?.invalid && availableCarsForm.get('city')?.touched) {
+        <small class="text-danger">Please select a valid city</small>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="startDate">Start Date and Time</label>
+      <input
+        id="startDate"
+        type="datetime-local"
+        formControlName="startDate"
+        class="form-control">
+      @if (availableCarsForm.get('startDate')?.invalid && availableCarsForm.get('startDate')?.touched) {
+        <small class="text-danger">Start date and time is required</small>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="endDate">End Date and Time</label>
+      <input
+        id="endDate"
+        type="datetime-local"
+        formControlName="endDate"
+        class="form-control">
+      @if (availableCarsForm.get('endDate')?.invalid && availableCarsForm.get('endDate')?.touched) {
+        <small class="text-danger">End date and time is required</small>
+      }
+    </div>
+
+    <button type="submit" [disabled]="availableCarsForm.invalid" class="btn btn-primary">Search Available Cars</button>
+  </form>
+
+  @if (hasSearched) {
+    <div class="search-results">
+      <h3>Available Cars</h3>
+
+      @if (availableVehiclesByLocation.length === 0) {
+        <p>No vehicles available for the selected criteria.</p>
+      } @else {
+        @for (locationData of availableVehiclesByLocation; track locationData.location) {
+          <div class="location-section">
+            <h4 class="location-title">{{ locationData.location }}</h4>
+            <div class="vehicles-grid">
+              @for (vehicle of locationData.vehicles; track vehicle.model) {
+                <div class="vehicle-card">
+                  <h5>{{ vehicle.brand }} {{ vehicle.model }}</h5>
+                  <p class="vehicle-category">{{ vehicle.category }}</p>
+                  <div class="pricing">
+                    <p class="price-per-day">{{ vehicle.pricePerDay}} / day</p>
+                    <div class="price-details">
+                      <p>Reservation: {{ vehicle.priceDto.reservationPrice}}</p>
+                      <p>Insurance refund: {{ vehicle.priceDto.insuranceRefundPrice}}</p>
+                      <p class="total-price">Total: {{ vehicle.priceDto.realRentalPrice}}</p>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary">Select Vehicle</button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+} @else {
+  <h3>Login to make a reservation</h3>
+  <button routerLink="/login" class="btn btn-primary">Go to Login</button>
+}
