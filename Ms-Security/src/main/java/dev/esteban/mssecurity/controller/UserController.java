@@ -14,12 +14,12 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/all")
+    @GetMapping("/all")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    @PostMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
         if (!role.equals("ADMIN")) {
             return ResponseEntity.status(403).body("Access denied");
