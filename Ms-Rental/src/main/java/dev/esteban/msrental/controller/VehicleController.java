@@ -19,17 +19,17 @@ public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
 
-    @PostMapping("/all")
+    @GetMapping("/all")
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
     }
 
-    @PostMapping("/{id}")
+    @GetMapping("/{id}")
     public Vehicle getVehicleById(@PathVariable Long id) {
         return vehicleRepository.findById(id).orElse(null);
     }
 
-    @PostMapping("/available")
+    @GetMapping("/available")
     public ResponseEntity<?> getAvailableCars(@RequestBody VehicleSearchDto vehicleSearchDto) {
         return vehicleService.getAvailableCars(vehicleSearchDto);
     }
