@@ -29,7 +29,7 @@ public class VehicleController {
         return vehicleRepository.findById(id).orElse(null);
     }
 
-    @GetMapping("/available")
+    @PostMapping("/available")
     public ResponseEntity<?> getAvailableCars(@RequestBody VehicleSearchDto vehicleSearchDto) {
         return vehicleService.getAvailableCars(vehicleSearchDto);
     }
