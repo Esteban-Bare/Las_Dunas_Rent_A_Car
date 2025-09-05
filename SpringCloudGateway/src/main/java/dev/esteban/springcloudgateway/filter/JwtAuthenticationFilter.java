@@ -1,11 +1,14 @@
 package dev.esteban.springcloudgateway.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -52,6 +55,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
                         ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
                                 .header("X-User-Role", exchange.getAttribute("USER_ROLE").toString())
                                 .header("X-User-Email", exchange.getAttribute("USER_EMAIL").toString())
+                                .header("x-User-Id", exchange.getAttribute("USER_ID") != null ? exchange.getAttribute("USER_ID").toString() : "")
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                                 .build();
 
@@ -96,7 +100,21 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
-        return response.setComplete();
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> errorBody = Map.of(
+                "error", httpStatus.getReasonPhrase(),
+                "status", httpStatus.value(),
+                "message", "Unauthorized access - invalid or missing token"
+        );
+
+        try {
+            byte[] bytes = new ObjectMapper().writeValueAsBytes(errorBody);
+            DataBuffer buffer = response.bufferFactory().wrap(bytes);
+            return response.writeWith(Mono.just(buffer));
+        } catch (Exception e) {
+            return Mono.error(e);
+        }
     }
 
 

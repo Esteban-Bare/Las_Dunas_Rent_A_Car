@@ -87,6 +87,7 @@ public class LoginController {
         if (response.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.ok(Map.of("message", "User registered successfully"));
         } else {
+            System.out.println(response.getBody());
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         }
     }

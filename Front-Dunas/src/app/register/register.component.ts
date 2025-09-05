@@ -62,6 +62,7 @@ export class RegisterComponent {
         birthDate: birthDate
       }
 
+      console.log("Registering user:", registerData);
       await this.AuthService.register(registerData);
       console.log("Registration successful");
       this.router.navigate(['/login']);

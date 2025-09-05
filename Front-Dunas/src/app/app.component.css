@@ -10,6 +10,10 @@
 /* Personnalisation de l'en-tête */
 .navbar {
   background-color: var(--primary-color) !important; /* Remplace le bg-primary */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
@@ -42,6 +46,11 @@
 .nav-link.active {
   background-color: rgba(158, 202, 225, 0.25);
   color: var(--secondary-color) !important;
+}
+
+main {
+  padding-top: 20px;
+  min-height: calc(100vh - 60px);
 }
 
 /* Adaptation mobile */

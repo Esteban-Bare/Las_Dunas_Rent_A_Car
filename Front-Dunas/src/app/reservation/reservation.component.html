@@ -60,11 +60,15 @@
                   <p class="vehicle-category">{{ vehicle.category }}</p>
                   <div class="pricing">
                     <p class="price-per-day">{{ vehicle.pricePerDay}} / day</p>
-                    <div class="price-details">
-                      <p>Reservation: {{ vehicle.priceDto.reservationPrice}}</p>
-                      <p>Insurance refund: {{ vehicle.priceDto.insuranceRefundPrice}}</p>
-                      <p class="total-price">Total: {{ vehicle.priceDto.realRentalPrice}}</p>
-                    </div>
+                    @if (vehicle.priceDto === null) {
+                      <p class="price-details">Price details not available</p>
+                    } @else {
+                      <div class="price-details">
+                        <p>Reservation: {{ vehicle.priceDto.reservationPrice}}</p>
+                        <p>Insurance refund: {{ vehicle.priceDto.insuranceRefundPrice}}</p>
+                        <p class="total-price">Total: {{ vehicle.priceDto.realRentalPrice}}</p>
+                      </div>
+                    }
                   </div>
                   <button class="btn btn-primary">Select Vehicle</button>
                 </div>

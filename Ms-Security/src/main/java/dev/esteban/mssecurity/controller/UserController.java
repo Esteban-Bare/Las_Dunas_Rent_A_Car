@@ -3,10 +3,8 @@ package dev.esteban.mssecurity.controller;
 import dev.esteban.mssecurity.model.User;
 import dev.esteban.mssecurity.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,9 +20,14 @@ public class UserController {
     }
 
     @PostMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userRepository.findById(id).orElse(null);
+    public ResponseEntity<?> getUserById(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
+        if (!role.equals("ADMIN")) {
+            return ResponseEntity.status(403).body("Access denied");
+        }
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+        return ResponseEntity.ok(user);
     }
-
-
 }
