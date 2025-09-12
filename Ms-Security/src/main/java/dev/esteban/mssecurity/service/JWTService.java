@@ -28,6 +28,7 @@ public class JWTService {
     public JWTService(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
     }
+
     public String createJwtToken(UserLogDto info) {
         User user = userRepository.findByEmail(info.getEmail()).orElseThrow(() -> new RuntimeException("Email not found"));
         if (!isValidUser(info)) {

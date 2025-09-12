@@ -38,29 +38,30 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-
         if (isSecured(request)) {
             String token = extractTokenFromCookies(request);
             if (token == null) {
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
-
             return isValidToken(token, exchange)
-                    .flatMap(isValid -> {
-                        if (!isValid) {
-                            return onError(exchange, HttpStatus.UNAUTHORIZED);
-                        }
+                .flatMap(isValid -> {
+                    if (!isValid) {
+                        return onError(exchange, HttpStatus.UNAUTHORIZED);
+                    }
 
-                        // Propagation des informations utilisateur aux services en aval
-                        ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
-                                .header("X-User-Role", exchange.getAttribute("USER_ROLE").toString())
-                                .header("X-User-Email", exchange.getAttribute("USER_EMAIL").toString())
-                                .header("x-User-Id", exchange.getAttribute("USER_ID") != null ? exchange.getAttribute("USER_ID").toString() : "")
-                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                                .build();
+                    // Propagation des informations utilisateur aux services en aval
+                    ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
+                            .header("X-User-Role",
+                                    exchange.getAttribute("USER_ROLE").toString())
+                            .header("X-User-Email",
+                                    exchange.getAttribute("USER_EMAIL").toString())
+                            .header("x-User-Id",
+                                    exchange.getAttribute("USER_ID") != null ? exchange.getAttribute("USER_ID").toString() : "")
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .build();
 
-                        return chain.filter(exchange.mutate().request(modifiedRequest).build());
-                    });
+                    return chain.filter(exchange.mutate().request(modifiedRequest).build());
+                });
         }
 
         return chain.filter(exchange);

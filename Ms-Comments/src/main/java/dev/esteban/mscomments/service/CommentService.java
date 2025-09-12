@@ -27,39 +27,28 @@ public class CommentService {
     public String saveComment(CommentDto comment) {
         try {
             Comment newComment = new Comment();
-            if (comment.getVehicleId() == null) {
-                throw new RuntimeException("Vehicle ID cannot be null.");
-            }
-            if (msRentalFeignClient.getVehicleById(Long.valueOf(comment.getVehicleId())) != null) {
-                newComment.setVehicleId(comment.getVehicleId());
-            } else {
+
+            if (comment.getVehicleId() == null) throw new RuntimeException("Vehicle ID cannot be null.");
+            if (msRentalFeignClient.getVehicleById(Long.valueOf(comment.getVehicleId())) == null)
                 throw new RuntimeException("Vehicle with ID " + comment.getVehicleId() + " does not exist.");
+            newComment.setVehicleId(comment.getVehicleId());
+
+            if (comment.getUserId() == null) throw new RuntimeException("User ID cannot be null.");
+            try {
+                msSecurityFeignClient.getUserById(Long.valueOf(comment.getUserId()));
+            } catch (Exception e) {
+                throw new RuntimeException("User with ID " + comment.getUserId() + " does not exist.");
             }
-            if (comment.getUserId() != null) {
-//                if (msSecurityFeignClient.getUserById(Long.valueOf(comment.getUserId())) != null) {
-//                    newComment.setUserId(comment.getUserId());
-//                } else {
-//                    throw new RuntimeException("User with ID " + comment.getUserId() + " does not exist.");
-//                }
-                try {
-                    msSecurityFeignClient.getUserById(Long.valueOf(comment.getUserId()));
-                    newComment.setUserId(comment.getUserId());
-                } catch (Exception e) {
-                    throw new RuntimeException("User with ID " + comment.getUserId() + " does not exist.");
-                }
-            } else {
-                throw new RuntimeException("User ID cannot be null.");
-            }
-            if (comment.getRating() < 1 || comment.getRating() > 5) {
+            newComment.setUserId(comment.getUserId());
+
+            if (comment.getRating() < 1 || comment.getRating() > 5)
                 throw new RuntimeException("Rating must be between 1 and 5.");
-            } else {
-                newComment.setRating(comment.getRating());
-            }
-            if (comment.getComment() == null || comment.getComment().isEmpty()) {
+            newComment.setRating(comment.getRating());
+
+            if (comment.getComment() == null || comment.getComment().isEmpty())
                 throw new RuntimeException("Comment cannot be empty.");
-            } else {
-                newComment.setComment(comment.getComment());
-            }
+            newComment.setComment(comment.getComment());
+
             newComment.setTimestamp(LocalDate.now().toString());
             System.out.println(newComment);
             commentRepository.save(newComment);
@@ -68,7 +57,6 @@ public class CommentService {
             throw new RuntimeException("Error saving comment: " + e.getMessage());
         }
     }
-
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
     }

@@ -42,7 +42,9 @@ public class VehicleService {
                 return isAvailable && !isReserved;
             }).map(vehicle -> {
                 try {
-                    ResponseEntity<PriceDto> response = msPricingFeignClient.getPricesByCar(new VehiclePriceDto(vehicle.getId(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour()));
+                    ResponseEntity<PriceDto> response = msPricingFeignClient
+                     .getPricesByCar(new VehiclePriceDto(vehicle.getId(),
+                             vehicle.getCategory().getName(), vehicle.getPricePerDay(), vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour()));
                     if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                         PriceDto pricesDto = response.getBody();
                         return new VehicleDto(vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), pricesDto);
@@ -52,7 +54,6 @@ public class VehicleService {
                 } catch (Exception e) {
                     return new VehicleDto(vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), null);
                 }})
-//            .filter(vehicleDto -> vehicleDto.getPriceDto() != null)
                     .collect(Collectors.toList());
             storeVehicles.put(store.getName(), vehicles);
         });
