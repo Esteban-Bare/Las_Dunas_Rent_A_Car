@@ -1,0 +1,95 @@
+<div class="container mt-4">
+  @if (reservationDetails) {
+    <h3>Complete Your Reservation</h3>
+
+    <div class="reservation-summary">
+      <div class="card">
+        <div class="card-header">
+          <h5>Reservation Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Vehicle Information</h6>
+              <p><strong>Vehicle:</strong> {{ reservationDetails.vehicle.brand }} {{ reservationDetails.vehicle.model }}</p>
+              <p><strong>Category:</strong> {{ reservationDetails.vehicle.category }}</p>
+              <p><strong>Price per day:</strong> {{ reservationDetails.vehicle.pricePerDay }}€</p>
+            </div>
+            <div class="col-md-6">
+              <h6>Pickup Information</h6>
+              <p><strong>Location:</strong> {{ reservationDetails.store.location }}</p>
+              <p><strong>Start Date:</strong> {{ reservationDetails.startDate | date:'medium' }}</p>
+              <p><strong>End Date:</strong> {{ reservationDetails.endDate | date:'medium' }}</p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Insurance Selection -->
+          <div class="insurance-selection mb-3">
+            <h6>Insurance Options</h6>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="insuranceCheck"
+                [(ngModel)]="includeInsurance">
+              <label class="form-check-label" for="insuranceCheck">
+                Include Insurance Coverage ({{ reservationDetails.vehicle.priceDto.insuranceRefundPrice }}€)
+              </label>
+              <small class="form-text text-muted d-block">
+                Insurance provides coverage for damages and reduces your liability.
+              </small>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="pricing-breakdown">
+            <h6>Pricing Breakdown</h6>
+            <div class="row">
+              <div class="col-12">
+                <p>Reservation Fee: <span class="float-end">{{ reservationDetails.vehicle.priceDto.reservationPrice }}€</span></p>
+                @if (includeInsurance) {
+                  <p>Insurance Coverage: <span class="float-end">{{ reservationDetails.vehicle.priceDto.insuranceRefundPrice }}€</span></p>
+                } @else {
+                  <p class="text-muted">Insurance Coverage: <span class="float-end">Not selected</span></p>
+                }
+                <hr>
+                <p class="h5">Total: <span class="float-end text-success">{{ calculateTotalPrice() }}€</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-buttons mt-3">
+      <button class="btn btn-secondary me-2" (click)="goBack()" [disabled]="isLoading">
+        Back to Vehicle Selection
+      </button>
+      <button class="btn btn-success" (click)="completeReservation()" [disabled]="isLoading">
+        @if (isLoading) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Processing...
+        } @else {
+          Complete Reservation
+        }
+      </button>
+    </div>
+  } @else {
+    <div class="alert alert-warning">
+      <h4>No reservation data found</h4>
+      <p>Please select a vehicle from the reservation page.</p>
+      <button class="btn btn-primary" (click)="goBack()">Go to Reservations</button>
+    </div>
+  }
+
+  <app-payment-popup
+    [isVisible]="showPaymentPopup"
+    [payments]="reservationPayments"
+    [title]="'Complete Your Reservation Payment'"
+    (paymentCompleted)="onPaymentCompleted()"
+    (paymentCancelled)="onPaymentCancelled()">
+  </app-payment-popup>
+</div>

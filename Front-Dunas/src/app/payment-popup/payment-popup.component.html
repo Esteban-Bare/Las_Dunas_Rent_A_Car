@@ -1,0 +1,54 @@
+@if (isVisible) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ title }}</h4>
+        <button type="button" class="btn-close" (click)="closePopup()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="payments-list">
+          <h5>Payments to Process</h5>
+          @for (payment of payments; track payment.id) {
+            <div class="payment-item">
+              <div class="payment-info">
+                <span class="payment-type">{{ payment.paymentType }}</span>
+                <span class="payment-description">{{ payment.description }}</span>
+                <span class="payment-amount">{{ payment.amount }}€</span>
+              </div>
+            </div>
+          }
+
+
+          <hr>
+          <div class="total-amount">
+            <strong>Total: {{ getTotalAmount() }}€</strong>
+          </div>
+        </div>
+
+        <div class="payment-method-section mt-3">
+          <h6>Payment Method</h6>
+          <select class="form-select" [(ngModel)]="selectedPaymentMethod">
+            <option value="CREDIT_CARD">Credit Card</option>
+            <option value="DEBIT_CARD">Debit Card</option>
+            <option value="PAYPAL">PayPal</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary me-2" (click)="closePopup()" [disabled]="isProcessing">
+          Cancel
+        </button>
+        <button class="btn btn-success" (click)="processPayments()" [disabled]="isProcessing">
+          @if (isProcessing) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Processing...
+          } @else {
+            Pay Now
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
