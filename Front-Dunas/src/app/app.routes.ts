@@ -8,6 +8,7 @@ import {AuthGuard} from './guard/auth.guard';
 import {LoggedGuard} from './guard/logged.guard';
 import {RegisterComponent} from './register/register.component';
 import {ReservationComponent} from './reservation/reservation.component';
+import {CreateReservationComponent} from './create-reservation/create-reservation.component';
 
 export const routes: Routes = [
   {path: "", component: HomeComponent},
@@ -17,5 +18,6 @@ export const routes: Routes = [
   {path: "admin/backoffice", component: BackofficeComponent,canActivate: [AuthGuard], data : { role: 'admin', resource: 'admin-backoffice' } },
   {path: "unauthorized", component: UnauthorizedComponent},
   {path: "register", component: RegisterComponent, canActivate: [LoggedGuard]},
-  {path: "reservations", component: ReservationComponent}
+  {path: "reservations", component: ReservationComponent},
+  {path: "create-reservation", component: CreateReservationComponent}
 ];

@@ -1,6 +1,7 @@
 package dev.esteban.msrental.controller;
 
 import dev.esteban.msrental.dto.NewReservationDto;
+import dev.esteban.msrental.dto.ReservationDto;
 import dev.esteban.msrental.model.Reservation;
 import dev.esteban.msrental.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,14 @@ public class ReservationController {
     private ReservationService reservationService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createReservation(@RequestBody NewReservationDto newReservationDto) {
+    public ResponseEntity<?> createReservation(@RequestHeader("X-User-Id") String id,@RequestBody NewReservationDto newReservationDto) {
+        newReservationDto.setUserId(Integer.parseInt(id));
         return reservationService.createReservation(newReservationDto);
     }
 
     @GetMapping("/{id}")
-    public Reservation getReservationById(@PathVariable Long id) {
-        return reservationService.getReservationById(id).isPresent() ? reservationService.getReservationById(id).get() : null;
+    public ResponseEntity<?> getReservationById(@PathVariable Long id) {
+        return reservationService.getReservationById(id).isPresent() ? ResponseEntity.ok(new ReservationDto(reservationService.getReservationById(id).get())) : ResponseEntity.badRequest().body("Reservation not found");
     }
 
     @GetMapping("/user/{userId}")

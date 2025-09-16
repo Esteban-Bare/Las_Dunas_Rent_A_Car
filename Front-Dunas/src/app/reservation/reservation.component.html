@@ -47,30 +47,31 @@
     <div class="search-results">
       <h3>Available Cars</h3>
 
-      @if (availableVehiclesByLocation.length === 0) {
+      @if (availableStores.length === 0) {
         <p>No vehicles available for the selected criteria.</p>
       } @else {
-        @for (locationData of availableVehiclesByLocation; track locationData.location) {
+        @for (store of availableStores; track store.storeId + store.location) {
           <div class="location-section">
-            <h4 class="location-title">{{ locationData.location }}</h4>
+            <h4 class="location-title">{{ store.location }} </h4>
             <div class="vehicles-grid">
-              @for (vehicle of locationData.vehicles; track vehicle.model) {
+              @for (vehicle of store.vehicles; track vehicle.vehicleId) {
                 <div class="vehicle-card">
                   <h5>{{ vehicle.brand }} {{ vehicle.model }}</h5>
                   <p class="vehicle-category">{{ vehicle.category }}</p>
                   <div class="pricing">
-                    <p class="price-per-day">{{ vehicle.pricePerDay}} / day</p>
+                    <p class="price-per-day">{{ vehicle.pricePerDay }}€ / day</p>
                     @if (vehicle.priceDto === null) {
                       <p class="price-details">Price details not available</p>
                     } @else {
                       <div class="price-details">
-                        <p>Reservation: {{ vehicle.priceDto.reservationPrice}}</p>
-                        <p>Insurance refund: {{ vehicle.priceDto.insuranceRefundPrice}}</p>
-                        <p class="total-price">Total: {{ vehicle.priceDto.realRentalPrice}}</p>
+                        <p>Reservation: {{ vehicle.priceDto.reservationPrice }}€</p>
+                        <p>Insurance refund: {{ vehicle.priceDto.insuranceRefundPrice }}€</p>
+                        <p class="total-price">Total: {{ vehicle.priceDto.realRentalPrice }}€</p>
                       </div>
                     }
                   </div>
-                  <button class="btn btn-primary">Select Vehicle</button>
+                  <button class="btn btn-primary" (click)="selectVehicle(vehicle, store)">
+                  Select Vehicle</button>
                 </div>
               }
             </div>

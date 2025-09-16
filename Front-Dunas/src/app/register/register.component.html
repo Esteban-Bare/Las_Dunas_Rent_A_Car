@@ -1,49 +1,81 @@
 <div class="register-container">
   <h2>Create Account</h2>
+
+  @if (registerError) {
+    <div class="form-error">
+      {{ registerError }}
+    </div>
+  }
+
   <form [formGroup]="registerForm" (ngSubmit)="register()">
     <div class="form-group">
       <input type="text" formControlName="firstName" placeholder="First Name" required>
-      <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched" class="error-message">
-        First name is required and must be at least 2 characters
-      </div>
+      @if (registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched) {
+        <div class="error-message">
+          First name is required and must be at least 2 characters
+        </div>
+      }
     </div>
 
     <div class="form-group">
       <input type="text" formControlName="lastName" placeholder="Last Name" required>
-      <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched" class="error-message">
-        Last name is required and must be at least 2 characters
-      </div>
+      @if (registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched) {
+        <div class="error-message">
+          Last name is required and must be at least 2 characters
+        </div>
+      }
     </div>
 
     <div class="form-group">
       <input type="email" formControlName="email" placeholder="Email" required>
-      <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-message">
-        Please enter a valid email address
-      </div>
+      @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+        <div class="error-message">
+          Please enter a valid email address
+        </div>
+      }
     </div>
 
     <div class="form-group">
       <input type="password" formControlName="password" placeholder="Password" required>
-      <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
-        Password must be at least 8 characters
-      </div>
+      @if (registerForm.get('password')?.touched) {
+        <div class="password-requirements">
+          Password requirements:
+          <ul>
+            <li [class]="getPasswordLength() >= 8 ? 'valid' : 'invalid'">At least 8 characters</li>
+            <li [class]="hasUppercase() ? 'valid' : 'invalid'">One uppercase letter</li>
+            <li [class]="hasLowercase() ? 'valid' : 'invalid'">One lowercase letter</li>
+            <li [class]="hasNumber() ? 'valid' : 'invalid'">One number</li>
+          </ul>
+        </div>
+      }
     </div>
 
     <div class="form-group">
       <input type="password" formControlName="confirmPassword" placeholder="Confirm Password" required>
-      <div *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched" class="error-message">
-        Please confirm your password
-      </div>
+      @if (registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
+        <div class="error-message">
+          @if (!passwordsMatch()) {
+            <span>Passwords do not match</span>
+          }
+          @if (registerForm.get('confirmPassword')?.hasError('required')) {
+            <span>Please confirm your password</span>
+          }
+        </div>
+      }
     </div>
 
     <div class="form-group">
-      <input type="date" formControlName="birthDate" placeholder="Birth Date (YYYY-MM-DD)" required>
-      <div *ngIf="registerForm.get('birthDate')?.invalid && registerForm.get('birthDate')?.touched" class="error-message">
-        Please enter a valid birth date
-      </div>
+      <input type="date" formControlName="birthDate" placeholder="Birth Date" required>
+      @if (registerForm.get('birthDate')?.invalid && registerForm.get('birthDate')?.touched) {
+        <div class="error-message">
+          Please enter a valid birth date
+        </div>
+      }
     </div>
 
-    <button type="submit" [disabled]="registerForm.invalid">Register</button>
+    <button type="submit" [disabled]="registerForm.invalid || !passwordsMatch() || isLoading">
+      {{ isLoading ? 'Creating Account...' : 'Register' }}
+    </button>
   </form>
 
   <div class="login-link">

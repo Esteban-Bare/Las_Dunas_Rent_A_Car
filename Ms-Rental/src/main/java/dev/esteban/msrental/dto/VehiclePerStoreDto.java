@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class AvailableVehicleDto {
-    private List<VehiclePerStoreDto> vehiclesPerCity;
+@AllArgsConstructor
+public class VehiclePerStoreDto {
+    private Map<String, List<VehicleDto>> storeVehicles;
+    private Long storeId;
 }
-

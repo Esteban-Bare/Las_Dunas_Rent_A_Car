@@ -41,7 +41,7 @@ public class JWTService {
                 .expiresAt(now.plus(1,ChronoUnit.DAYS))
                 .subject(info.getEmail())
                 .claim("role", user.getRole())
-                .claim("userId", user.getId())
+                .claim("userId", user.getId().toString())
                 .build();
         JwtEncoderParameters params = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims);
         return this.jwtEncoder.encode(params).getTokenValue();

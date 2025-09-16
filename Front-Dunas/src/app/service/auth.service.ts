@@ -44,9 +44,12 @@ export class AuthService {
 
       const data = await res.json();
 
+      console.log("Login successful:", data);
+
       const userInfo: UserInfo = {
         email: data.sub,
         role: data.role,
+        userId: data.userId,
         token: ""
       }
 
@@ -125,6 +128,9 @@ export class AuthService {
     return this.currentUserSubject.value?.email || null;
   }
 
+  public getId(): string | null {
+    return this.currentUserSubject.value?.userId || null;
+  }
   async register(registerData: RegisterData) {
     try {
       const res = await fetch("http://localhost:8077/auth/register", {

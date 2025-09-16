@@ -10,7 +10,8 @@ public enum StatusVehicle {
     AVAILABLE("Available"),
     UNAVAILABLE("Unavailable"),
     MAINTENANCE("Maintenance"),
-    RENTED("Rented");
+    RENTED("Rented"),
+    RESERVED("Reserved");
 
     private final String status;
 }

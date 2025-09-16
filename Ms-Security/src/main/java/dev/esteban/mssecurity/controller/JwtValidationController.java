@@ -25,6 +25,7 @@ public class JwtValidationController {
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
         System.out.println("Validating token: " + token);
         try {
+            System.out.println("Decoding token...");
             String jwt = token.replace("Bearer ", "");
             Jwt decodedJwt = jwtDecoder.decode(jwt);
 
@@ -32,6 +33,7 @@ public class JwtValidationController {
             response.put("valid", true);
             response.put("subject", decodedJwt.getSubject());
             response.put("role", decodedJwt.getClaim("role"));
+            response.put("userId", decodedJwt.getClaim("userId"));
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {

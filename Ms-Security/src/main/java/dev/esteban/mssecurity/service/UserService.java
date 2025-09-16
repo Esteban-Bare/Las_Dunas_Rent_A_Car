@@ -43,6 +43,7 @@ public class UserService {
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("email", user.getEmail());
             userInfo.put("role", user.getRole());
+            userInfo.put("userId", user.getId());
 
             return ResponseEntity.ok(userInfo);
         } catch (RuntimeException e) {

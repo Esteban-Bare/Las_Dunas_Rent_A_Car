@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
                             .header("X-User-Email",
                                     exchange.getAttribute("USER_EMAIL").toString())
                             .header("x-User-Id",
-                                    exchange.getAttribute("USER_ID") != null ? exchange.getAttribute("USER_ID").toString() : "")
+                                    exchange.getAttribute("USER_ID").toString())
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                             .build();
 
@@ -85,6 +85,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
                     System.out.println("Response: " + r);
                     Boolean isValid = (Boolean) r.get("valid");
                     if (isValid != null && isValid) {
+                        exchange.getAttributes().put("USER_ID", r.get("userId"));
                         exchange.getAttributes().put("USER_ROLE", r.get("role"));
                         exchange.getAttributes().put("USER_EMAIL", r.get("subject"));
                         return Mono.just(true);

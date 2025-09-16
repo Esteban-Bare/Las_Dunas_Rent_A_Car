@@ -1,0 +1,122 @@
+.register-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.register-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.form-group input.ng-invalid.ng-touched {
+  border-color: #dc3545;
+}
+
+.form-group input.ng-valid.ng-touched {
+  border-color: #28a745;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.password-requirements {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.password-requirements ul {
+  margin: 0.5rem 0 0 1rem;
+  padding: 0;
+}
+
+.password-requirements li {
+  margin-bottom: 0.25rem;
+  transition: color 0.3s ease;
+}
+
+.password-requirements li.valid {
+  color: #28a745;
+}
+
+.password-requirements li.invalid {
+  color: #dc3545;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+button[type="submit"]:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #666;
+}
+
+.login-link a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.form-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid #f5c6cb;
+}

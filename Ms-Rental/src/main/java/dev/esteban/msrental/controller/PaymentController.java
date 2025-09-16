@@ -1,5 +1,6 @@
 package dev.esteban.msrental.controller;
 
+import dev.esteban.msrental.dto.PaymentDto;
 import dev.esteban.msrental.dto.PaymentProcessDto;
 import dev.esteban.msrental.model.Payment;
 import dev.esteban.msrental.service.PaymentService;
@@ -18,9 +19,9 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @PostMapping("/{paymentId}/process")
-    public ResponseEntity<?> processPayment(@PathVariable Long paymentId, @RequestBody PaymentProcessDto paymentProcessDto) {
+    public ResponseEntity<?> processPayment(@PathVariable String paymentId, @RequestBody PaymentProcessDto paymentProcessDto) {
         try {
-            Payment processedPayment = paymentService.processPayment(paymentId, paymentProcessDto.getPaymentMethod());
+            Payment processedPayment = paymentService.processPayment(Long.valueOf(paymentId), paymentProcessDto.getPaymentMethod());
             return ResponseEntity.ok(processedPayment);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -38,9 +39,9 @@ public class PaymentController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Payment>> getUserPayments(@PathVariable Integer userId) {
+    public ResponseEntity<List<PaymentDto>> getUserPayments(@PathVariable Integer userId) {
         List<Payment> payments = paymentService.getPaymentsByUserId(userId);
-        return ResponseEntity.ok(payments);
+        return ResponseEntity.ok(payments.stream().map(PaymentDto::new).toList());
     }
 
     @GetMapping("/user/{userId}/total")

@@ -1,6 +1,7 @@
 package dev.esteban.msrental.service;
 
 import dev.esteban.msrental.dto.NewReservationDto;
+import dev.esteban.msrental.dto.ReservationDto;
 import dev.esteban.msrental.enums.PaymentType;
 import dev.esteban.msrental.enums.ReservationStatus;
 import dev.esteban.msrental.model.Reservation;
@@ -60,15 +61,18 @@ public class ReservationService {
             if (!isAvailable) {
                 return ResponseEntity.badRequest().body("Vehicle is not available for the requested dates");
             }
+
             Reservation reservation = new Reservation(newReservationDto.getUserId(), vehicle.get(), store.get(), newReservationDto.getRequestedStartDate(),
                     newReservationDto.getRequestedEndDate(), newReservationDto.getReservationPrice(), newReservationDto.getInsurancePrice(), ReservationStatus.COMPLETED
             );
             Reservation savedReservation = reservationRepository.save(reservation);
+
             paymentService.createPaymentForReservation(savedReservation, PaymentType.RESERVATION,newReservationDto.getReservationPrice());
             if (newReservationDto.getInsurancePrice().compareTo(BigDecimal.ZERO) > 0) {
                 paymentService.createPaymentForReservation(savedReservation, PaymentType.INSURANCE, newReservationDto.getInsurancePrice());
             }
-            return ResponseEntity.ok(savedReservation);
+            ReservationDto reservationDto = new ReservationDto(reservation);
+            return ResponseEntity.ok(reservationDto);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("An error occurred while creating the reservation: " + e.getMessage());
         }
@@ -100,7 +104,15 @@ public class ReservationService {
     }
 
     private boolean isVehicleAvailable(Long vehicleId, LocalDateTime requestedStartDate, LocalDateTime requestedEndDate) {
-        List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(vehicleId, requestedStartDate, requestedEndDate);
+        int bufferHours = 12; // 12-hour buffer before and after the reservation
+        LocalDateTime bufferedStartDate = requestedStartDate.minusHours(bufferHours);
+        LocalDateTime bufferedEndDate = requestedEndDate.plusHours(bufferHours);
+
+        List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(
+                vehicleId,
+                bufferedStartDate,
+                bufferedEndDate
+        );
         return overlappingReservations.isEmpty();
     }
 }

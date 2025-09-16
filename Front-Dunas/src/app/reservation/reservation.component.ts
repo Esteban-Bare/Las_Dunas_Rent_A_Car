@@ -2,9 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../service/auth.service';
 import {AsyncPipe} from '@angular/common';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 
 interface VehicleInfo {
+  vehicleId: number;
   model: string;
   brand: string;
   category: string;
@@ -16,10 +17,19 @@ interface VehicleInfo {
   };
 }
 
-interface LocationVehicles {
+interface StoreData {
+  storeId: number;
   location: string;
   vehicles: VehicleInfo[];
 }
+
+interface AvailableVehiclesResponse {
+  vehiclesPerCity: {
+    storeId: number;
+    storeVehicles: { [location: string]: VehicleInfo[] };
+  }[];
+}
+
 
 @Component({
   selector: 'app-reservation',
@@ -32,10 +42,12 @@ interface LocationVehicles {
   styleUrl: './reservation.component.css'
 })
 export class ReservationComponent implements OnInit{
-  availableVehiclesByLocation: LocationVehicles[] = [];
+  availableStores: StoreData[] = [];
   hasSearched: boolean = false;
 
-  constructor(protected authService: AuthService) {}
+  constructor(protected authService: AuthService, private router: Router) {}
+
+
   ngOnInit() {
     this.authService.checkAuthStatus();
   }
@@ -63,7 +75,7 @@ export class ReservationComponent implements OnInit{
       };
 
       console.log(searchData);
-      fetch("http://localhost:8077/rental/vehicle/available", {
+      fetch("http://localhost:8077/rental/vehicles/available", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -78,27 +90,39 @@ export class ReservationComponent implements OnInit{
             throw new Error('Network response was not ok');
           }
         })
-        .then((data) => {
-          // Transform the response to match the expected format
-          const transformedData: LocationVehicles[] = [];
+        .then((data: AvailableVehiclesResponse) => {
+          const stores: StoreData[] = [];
 
-          if (data.vehicles) {
-            Object.keys(data.vehicles).forEach(locationName => {
-              transformedData.push({
-                location: locationName,
-                vehicles: data.vehicles[locationName]
+          data.vehiclesPerCity.forEach(store => {
+            Object.entries(store.storeVehicles).forEach(([location, vehicles]) => {
+              stores.push({
+                storeId: store.storeId,
+                location: location,
+                vehicles: vehicles
               });
             });
-          }
+          });
 
-          this.availableVehiclesByLocation = transformedData;
+
+          this.availableStores = stores;
           this.hasSearched = true;
-          console.log('Available vehicles:', this.availableVehiclesByLocation);
+          console.log('Available vehicles:', this.availableStores);
         })
         .catch((error) => {
           console.error('There has been a problem with your fetch operation:', error);
         });
     }
+  }
+
+  selectVehicle(vehicle: VehicleInfo, store: StoreData) {
+    const reservationDetails = {
+      vehicle: vehicle,
+      store: store,
+      startDate: this.availableCarsForm.get('startDate')?.value + ":00",
+      endDate: this.availableCarsForm.get('endDate')?.value + ":00",
+    }
+
+    this.router.navigate(['/create-reservation'], { state: {reservationDetails: reservationDetails} });
   }
 
   protected readonly location = location;
