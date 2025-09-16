@@ -1,9 +1,117 @@
 <main>
-  <h1>
-    this is the home page
-    test
-  </h1>
-  <div>
-    <p>{{myVar}}</p>
-  </div>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="row align-items-center min-vh-75">
+        <div class="col-lg-6">
+          <h1 class="hero-title">
+            Discover Freedom with <span class="brand-highlight">Las Dunas</span>
+          </h1>
+          <p class="hero-subtitle">
+            Premium car rental service with unbeatable prices and exceptional customer experience.
+            Your journey starts here.
+          </p>
+          <div class="hero-actions">
+            <a routerLink="/vehicles" class="btn btn-primary btn-lg me-3">
+              <i class="bi bi-car-front me-2"></i>Browse Vehicles
+            </a>
+            <a routerLink="/stores" class="btn btn-outline-primary btn-lg">
+              <i class="bi bi-geo-alt me-2"></i>Find Locations
+            </a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-image">
+            <i class="bi bi-car-front display-1 text-primary"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="services-section py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center mb-5">
+          <h2 class="section-title">Why Choose Las Dunas?</h2>
+          <p class="section-subtitle">Excellence in every mile</p>
+        </div>
+      </div>
+      <div class="row g-4">
+        @for (service of services; track service.title) {
+          <div class="col-md-6 col-lg-3">
+            <div class="service-card text-center h-100">
+              <div class="service-icon">
+                <i class="{{ service.icon }}"></i>
+              </div>
+              <h4 class="service-title">{{ service.title }}</h4>
+              <p class="service-description">{{ service.description }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="featured-section py-5 bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center mb-5">
+          <h2 class="section-title">Featured Vehicles</h2>
+          <p class="section-subtitle">Popular choices for your next adventure</p>
+        </div>
+      </div>
+      <div class="row g-4">
+        @for (vehicle of featuredVehicles; track vehicle.model) {
+          <div class="col-md-4">
+            <div class="vehicle-card">
+              <div class="vehicle-image">
+                <i class="bi bi-car-front display-4 text-muted"></i>
+              </div>
+              <div class="vehicle-info">
+                <h5 class="vehicle-name">{{ vehicle.brand }} {{ vehicle.model }}</h5>
+                <p class="vehicle-category">{{ vehicle.category }}</p>
+                <div class="vehicle-price">
+                  <span class="price">{{ vehicle.pricePerDay }}€</span>
+                  <span class="period">/day</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="text-center mt-4">
+        <a routerLink="/vehicles" class="btn btn-primary">
+          View All Vehicles <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h2 class="cta-title">Ready to Hit the Road?</h2>
+          <p class="cta-subtitle">Join thousands of satisfied customers</p>
+          <div class="cta-actions">
+            @if (!authService.isLoggedIn()) {
+              <a routerLink="/login" class="btn btn-light btn-lg me-3">
+                <i class="bi bi-person me-2"></i>Sign In
+              </a>
+            }
+            @if (authService.isLoggedIn()) {
+              <a routerLink="/dashboard" class="btn btn-light btn-lg me-3">
+                <i class="bi bi-speedometer2 me-2"></i>My Dashboard
+              </a>
+            }
+            <a routerLink="/reservations" class="btn btn-outline-light btn-lg">
+              <i class="bi bi-calendar-check me-2"></i>Make Reservation
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>

@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(value = "security", configuration = FeignClientConfig.class)
 public interface MsSecurityFeignClient {
 
-    @RequestMapping(method = RequestMethod.POST, value = "/api/user/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/api/user/{id}")
     ResponseEntity<?> getUserById(@PathVariable Long id);
 }

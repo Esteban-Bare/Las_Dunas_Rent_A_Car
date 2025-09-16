@@ -123,6 +123,28 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <from>
+                        <image>eclipse-temurin:17-jdk</image>
+                        <!-- arm64 configuration
+                        <platforms>
+                            <platform>
+                                <architecture>arm64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                        -->
+                    </from>
+                    <to>
+                        <!-- to arm64 architecture change to :arm64 -->
+                        <image>estebanx55/lasdunasrentacar-ms-security:latest</image>
+                    </to>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

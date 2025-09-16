@@ -85,8 +85,14 @@ public class RentalService {
     }
 
     @Transactional
-    public Rental completeRental(Long rentalId) {
+    public String completeRental(Long rentalId) {
         Rental rental = getRentalById(rentalId);
+
+        boolean paymentsCompleted = rental.getPayments().stream()
+                .allMatch(payment -> payment.getPaymentType() == PaymentType.RENTAL && payment.getPaymentStatus().name().equals("COMPLETED"));
+        if (!paymentsCompleted) {
+            throw new RuntimeException("All rental payments must be completed before completing the rental");
+        }
 
         if (rental.getStatus() != RentalStatus.IN_PROGRESS) {
             throw new RuntimeException("Rental is not in progress");
@@ -98,8 +104,9 @@ public class RentalService {
         Vehicle vehicle = rental.getVehicle();
         vehicle.setStatus(StatusVehicle.AVAILABLE);
         vehicleRepository.save(vehicle);
+        rentalRepository.save(rental);
 
-        return rentalRepository.save(rental);
+        return "Rental completed successfully";
     }
 
     @Transactional
@@ -212,5 +219,10 @@ public class RentalService {
         } else {
             throw new RuntimeException("Failed to retrieve pricing information");
         }
+    }
+
+    public Long countRentalsByStatus(RentalStatus rentalStatus) {
+        List<Rental> rentals = rentalRepository.findByStatus(rentalStatus);
+        return (long) rentals.size();
     }
 }

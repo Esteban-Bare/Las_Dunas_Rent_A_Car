@@ -1,0 +1,155 @@
+<div class="payments-container">
+  <div class="payments-header">
+    <button class="back-btn" (click)="goBackToDashboard()">
+      ← Back to Dashboard
+    </button>
+    <h1>Pending Payments</h1>
+    <p class="subtitle">Manage your outstanding payments</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading your pending payments...</p>
+  </div>
+
+  <div class="payments-content" *ngIf="!isLoading">
+    <!-- Summary Card -->
+    <div class="summary-card">
+      <div class="summary-content">
+        <h3>Total Pending Amount</h3>
+        <div class="total-amount">€{{ totalPendingAmount.toFixed(2) }}</div>
+        <button
+          class="btn btn-pay-all"
+          (click)="payAllPendingPayments()"
+          *ngIf="totalPendingAmount > 0"
+        >
+          Pay All Pending
+        </button>
+      </div>
+    </div>
+
+    <!-- No Payments Message -->
+    <div class="no-payments" *ngIf="totalPendingAmount === 0">
+      <div class="no-payments-icon">✅</div>
+      <h2>All caught up!</h2>
+      <p>You have no pending payments at this time.</p>
+    </div>
+
+    <!-- Reservation Payments Section -->
+    <div class="payments-section" *ngIf="reservationsWithPendingPayments.length > 0">
+      <h2 class="section-title">
+        <span class="section-icon">📋</span>
+        Reservation Payments
+      </h2>
+
+      <div class="payments-grid">
+        <div
+          class="payment-card"
+          *ngFor="let reservation of reservationsWithPendingPayments"
+        >
+          <div class="card-header">
+            <h3>{{ reservation.vehicleModel }}</h3>
+            <span class="reservation-status">{{ reservation.status }}</span>
+          </div>
+
+          <div class="card-details">
+            <div class="detail-row">
+              <span class="label">Period:</span>
+              <span>{{ reservation.startDate | date:'MMM d' }} - {{ reservation.endDate | date:'MMM d, y' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Reservation ID:</span>
+              <span>#{{ reservation.id }}</span>
+            </div>
+          </div>
+
+          <div class="payments-list">
+            <h4>Pending Payments:</h4>
+            <div
+              class="payment-item"
+              *ngFor="let payment of reservation.payments"
+            >
+              <span class="payment-type" [class]="getPaymentTypeClass(payment.paymentType)">
+                {{ payment.paymentType }}
+              </span>
+              <span class="payment-description">{{ payment.description }}</span>
+              <span class="payment-amount">€{{ payment.amount.toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="total-row">
+              <strong>Total: €{{ getReservationTotal(reservation).toFixed(2) }}</strong>
+            </div>
+            <button class="btn btn-pay" (click)="payReservationPayments(reservation)">
+              Pay Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rental Payments Section -->
+    <div class="payments-section" *ngIf="rentalsWithPendingPayments.length > 0">
+      <h2 class="section-title">
+        <span class="section-icon">🚗</span>
+        Rental Payments
+      </h2>
+
+      <div class="payments-grid">
+        <div
+          class="payment-card"
+          *ngFor="let rental of rentalsWithPendingPayments"
+        >
+          <div class="card-header">
+            <h3>{{ rental.vehicleModel }}</h3>
+            <span class="rental-status">{{ rental.rentalStatus }}</span>
+          </div>
+
+          <div class="card-details">
+            <div class="detail-row">
+              <span class="label">Period:</span>
+              <span>{{ rental.startDate | date:'MMM d' }} - {{ rental.endDate | date:'MMM d, y' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Rental ID:</span>
+              <span>#{{ rental.id }}</span>
+            </div>
+          </div>
+
+          <div class="payments-list">
+            <h4>Pending Payments:</h4>
+            <div
+              class="payment-item"
+              *ngFor="let payment of rental.payments"
+            >
+              <span class="payment-type" [class]="getPaymentTypeClass(payment.paymentType)">
+                {{ payment.paymentType }}
+              </span>
+              <span class="payment-description">{{ payment.description }}</span>
+              <span class="payment-amount">€{{ payment.amount.toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="total-row">
+              <strong>Total: €{{ getRentalTotal(rental).toFixed(2) }}</strong>
+            </div>
+            <button class="btn btn-pay" (click)="payRentalPayments(rental)">
+              Pay Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Popup -->
+  <app-payment-popup
+    [isVisible]="showPaymentPopup"
+    [payments]="selectedPayments"
+    [title]="popupTitle"
+    (paymentCompleted)="onPaymentCompleted()"
+    (paymentCancelled)="onPaymentCancelled()"
+  ></app-payment-popup>
+</div>

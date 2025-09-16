@@ -27,6 +27,7 @@ public class PaymentDto {
     private String transactionId;
     private String description;
     private ReservationDto reservation;
+    private RentalDto rental;
 
     public PaymentDto(Payment payment) {
         this.id = payment.getId();
@@ -40,6 +41,9 @@ public class PaymentDto {
         this.description = payment.getDescription();
         if (payment.getReservation() != null) {
             this.reservation = new ReservationDto(payment.getReservation());
+        }
+        if (payment.getRental() != null) {
+            this.rental = new RentalDto(payment.getRental());
         }
     }
 }

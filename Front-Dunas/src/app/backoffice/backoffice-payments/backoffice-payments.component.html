@@ -1,0 +1,206 @@
+<div class="payments-container">
+  <div class="header">
+    <button class="back-btn secondary" (click)="goBackToBackoffice()">
+      ← Back to Backoffice
+    </button>
+    <h1>
+      <span class="icon">💳</span>
+      Payment Management
+    </h1>
+    <p class="subtitle">Manage all system payments and transactions</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading payments...</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="loadPayments()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading && !error) {
+    <div class="content">
+      <!-- Stats Section -->
+      <div class="payments-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ totalPayments }}</span>
+          <span class="stat-label">Total Payments</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ pendingCount }}</span>
+          <span class="stat-label">Pending</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ completedCount }}</span>
+          <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">€{{ totalRevenue }}</span>
+          <span class="stat-label">Total Revenue</span>
+        </div>
+      </div>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="filter-group">
+          <label class="filter-checkbox">
+            <input
+              type="checkbox"
+              [(ngModel)]="showOnlyPending"
+              (change)="onFilterChange()">
+            <span class="checkmark"></span>
+            Show only pending payments
+          </label>
+        </div>
+
+        <div class="filter-group">
+          <label for="typeFilter">Payment Type:</label>
+          <select
+            id="typeFilter"
+            class="filter-select"
+            [(ngModel)]="selectedPaymentType"
+            (change)="onFilterChange()">
+            <option value="">All Types</option>
+            @for (type of paymentTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="statusFilter">Status:</label>
+          <select
+            id="statusFilter"
+            class="filter-select"
+            [(ngModel)]="selectedStatus"
+            (change)="onFilterChange()">
+            <option value="">All Statuses</option>
+            @for (status of paymentStatuses; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <button class="clear-filters-btn" (click)="showOnlyPending = false; selectedPaymentType = ''; selectedStatus = ''; onFilterChange()">
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Payments Table -->
+      <div class="payments-table-container">
+        <table class="payments-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Method</th>
+            <th>Related</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (payment of filteredPayments; track payment.id) {
+              <tr class="payment-row">
+                <td class="payment-id">{{ payment.id }}</td>
+                <td class="payment-user">User #{{ payment.userId }}</td>
+                <td class="payment-amount">
+                  <span class="amount" [class.negative]="payment.paymentType === 'REFUND'">
+                    €{{ payment.amount.toFixed(2) }}
+                  </span>
+                </td>
+                <td class="payment-type">
+                  <span class="type-badge" [class]="getPaymentTypeClass(payment.paymentType)">
+                    {{ payment.paymentType }}
+                  </span>
+                </td>
+                <td class="payment-status">
+                  <span class="status-badge" [class]="getStatusBadgeClass(payment.paymentStatus)">
+                    {{ payment.paymentStatus }}
+                  </span>
+                </td>
+                <td class="payment-method">{{ payment.paymentMethod || 'N/A' }}</td>
+                <td class="payment-related">{{ getRelatedInfo(payment) }}</td>
+                <td class="payment-date">{{ payment.paymentDate | date:'short' }}</td>
+                <td class="payment-actions">
+                  <div class="action-group">
+                    @if (canProcessPayment(payment)) {
+                      <button
+                        class="action-btn process-btn"
+                        (click)="processPayment(payment.id)"
+                        [disabled]="processingPayments.has(payment.id)">
+                        @if (processingPayments.has(payment.id)) {
+                          Processing...
+                        } @else {
+                          Process
+                        }
+                      </button>
+                    }
+
+                    @if (canProcessDepositReturn(payment)) {
+                      <button
+                        class="action-btn deposit-return-btn"
+                        (click)="processDepositReturn(payment.id)"
+                        [disabled]="processingPayments.has(payment.id)">
+                        @if (processingPayments.has(payment.id)) {
+                          Processing...
+                        } @else {
+                          Return Deposit
+                        }
+                      </button>
+                    }
+
+                    @if (canProcessRefund(payment)) {
+                      <button
+                        class="action-btn refund-btn"
+                        (click)="processRefund(payment.id)"
+                        [disabled]="processingPayments.has(payment.id)">
+                        @if (processingPayments.has(payment.id)) {
+                          Processing...
+                        } @else {
+                          Refund
+                        }
+                      </button>
+                    }
+
+                    @if (!canProcessPayment(payment) && !canProcessDepositReturn(payment) && !canProcessRefund(payment)) {
+                      <span class="no-actions">No actions available</span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="9" class="empty-state">
+                  <div class="empty-content">
+                    <span class="empty-icon">💳</span>
+                    <h3>No payments found</h3>
+                    <p>
+                      @if (showOnlyPending || selectedPaymentType || selectedStatus) {
+                        No payments match your current filters.
+                      } @else {
+                        There are no payments in the system yet.
+                      }
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

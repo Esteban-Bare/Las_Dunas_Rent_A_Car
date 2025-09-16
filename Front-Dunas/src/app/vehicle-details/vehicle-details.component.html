@@ -1,0 +1,136 @@
+<div class="container mt-4">
+  @if (isLoading) {
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  } @else if (vehicle) {
+    <!-- Vehicle Details Section -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="vehicle-image-container">
+          <img src="/images/car-placeholder.png"
+               alt="{{ vehicle.brand }} {{ vehicle.model }}"
+               class="img-fluid vehicle-image"
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhciBJbWFnZTwvdGV4dD48L3N2Zz4='" />
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="vehicle-info">
+          <h2 class="vehicle-title">{{ vehicle.brand }} {{ vehicle.model }}</h2>
+          <div class="vehicle-details">
+            <div class="detail-row">
+              <span class="detail-label">Category:</span>
+              <span class="detail-value">{{ vehicle.category }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Price per day:</span>
+              <span class="detail-value price">{{ vehicle.pricePerDay }}€</span>
+            </div>
+          </div>
+
+          <div class="action-buttons mt-4">
+            <button class="btn btn-primary btn-lg" (click)="goToReservations()">
+              <i class="fas fa-calendar-alt me-2"></i>
+              Make Reservation
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section mt-5">
+      <h3>Customer Reviews</h3>
+
+      <!-- Add Comment Form (only if user can comment) -->
+      @if (isLoggedIn && canComment) {
+        <div class="add-comment-form card mb-4">
+          <div class="card-header">
+            <h5>Leave a Review</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="rating" class="form-label">Rating:</label>
+              <select id="rating" class="form-select" [(ngModel)]="newComment.rating">
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="comment" class="form-label">Comment:</label>
+              <textarea
+                id="comment"
+                class="form-control"
+                rows="3"
+                [(ngModel)]="newComment.comment"
+                placeholder="Share your experience with this vehicle...">
+              </textarea>
+            </div>
+            <button
+              class="btn btn-success"
+              (click)="submitComment()"
+              [disabled]="isSubmittingComment || !newComment.comment.trim()">
+              @if (isSubmittingComment) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Submitting...
+              } @else {
+                Submit Review
+              }
+            </button>
+          </div>
+        </div>
+      } @else if (isLoggedIn && !canComment) {
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          You can only leave a review after completing a rental with this vehicle.
+        </div>
+      } @else {
+        <div class="alert alert-warning">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          Please <a href="/login" class="alert-link">log in</a> to leave a review.
+        </div>
+      }
+
+      <!-- Comments List -->
+      <div class="comments-list">
+        @if (comments.length > 0) {
+          @for (comment of comments; track comment.id) {
+            <div class="comment-card card mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="comment-header">
+                    <div class="rating mb-2">
+                      @for (star of getStarArray(comment.rating); track $index) {
+                        <i class="fas fa-star" [class.text-warning]="star" [class.text-muted]="!star"></i>
+                      }
+                      <span class="ms-2 text-muted">({{ comment.rating }}/5)</span>
+                    </div>
+                  </div>
+                  <small class="text-muted">{{ formatDate(comment.timestamp) }}</small>
+                </div>
+                <p class="comment-text mb-0">{{ comment.comment }}</p>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="no-comments text-center py-4">
+            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No reviews yet. Be the first to review this vehicle!</p>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-danger">
+      <h4>Vehicle not found</h4>
+      <p>The requested vehicle could not be found.</p>
+      <button class="btn btn-primary" (click)="goToReservations()">Browse Vehicles</button>
+    </div>
+  }
+</div>

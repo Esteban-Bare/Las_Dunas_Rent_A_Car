@@ -1,5 +1,6 @@
 package dev.esteban.msrental.repository;
 
+import dev.esteban.msrental.enums.ReservationStatus;
 import dev.esteban.msrental.model.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +22,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findOverlappingReservations(@Param("vehicleId") Long vehicleId,
                                                   @Param("startDate") LocalDateTime startDate,
                                                   @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT r FROM Reservation r WHERE r.status = :status AND r.createdAt < :cutoffTime")
+    List<Reservation> findByStatusAndCreationDateBefore(@Param("status") ReservationStatus status, @Param("cutoffTime") LocalDateTime cutoffTime);
 }

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../service/auth.service';
 import {AsyncPipe} from '@angular/common';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 
 interface VehicleInfo {
@@ -30,7 +30,6 @@ interface AvailableVehiclesResponse {
   }[];
 }
 
-
 @Component({
   selector: 'app-reservation',
   imports: [
@@ -47,24 +46,32 @@ export class ReservationComponent implements OnInit{
 
   constructor(protected authService: AuthService, private router: Router) {}
 
-
   ngOnInit() {
     this.authService.checkAuthStatus();
   }
 
+  dateRangeValidator(group: AbstractControl): ValidationErrors | null {
+    const startDate = group.get('startDate')?.value;
+    const endDate = group.get('endDate')?.value;
+
+    if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
+      return { dateRange: true };
+    }
+    return null;
+  }
 
   availableCarsForm: FormGroup = new FormGroup({
     city: new FormControl<string>("", [
-        Validators.required,
-        Validators.pattern('^(toulon|marseille|nice|paris)$')
-      ]),
-    startDate: new FormControl<string>("", [
-       Validators.required
+      Validators.required,
+      Validators.pattern('^(toulon|marseille|nice|paris)$')
     ]),
-    endDate: new FormControl<string>("", [
+    startDate: new FormControl<string>("", [
       Validators.required
     ]),
-  })
+    endDate: new FormControl<string>("", [
+      Validators.required,
+    ]),
+  }, { validators: this.dateRangeValidator })
 
   searchAvailableCars() {
     if (this.availableCarsForm.valid) {
@@ -75,7 +82,7 @@ export class ReservationComponent implements OnInit{
       };
 
       console.log(searchData);
-      fetch("http://localhost:8077/rental/vehicles/available", {
+      fetch("http://localhost:8077/rental/vehicles/common/available", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -102,7 +109,6 @@ export class ReservationComponent implements OnInit{
               });
             });
           });
-
 
           this.availableStores = stores;
           this.hasSearched = true;

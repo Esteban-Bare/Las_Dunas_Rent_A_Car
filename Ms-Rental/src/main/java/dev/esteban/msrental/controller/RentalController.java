@@ -1,5 +1,6 @@
 package dev.esteban.msrental.controller;
 
+import dev.esteban.msrental.dto.RentalDto;
 import dev.esteban.msrental.enums.RentalStatus;
 import dev.esteban.msrental.model.Rental;
 import dev.esteban.msrental.service.RentalService;
@@ -17,7 +18,10 @@ public class RentalController {
     private RentalService rentalService;
 
     @PostMapping("/create/{reservationId}")
-    public ResponseEntity<?> createRentalFromReservation(@PathVariable Long reservationId) {
+    public ResponseEntity<?> createRentalFromReservation(@PathVariable Long reservationId , @RequestHeader("X-User-Role") String role) {
+        if (!role.equals("MANAGER") && !role.equals("ADMIN")) {
+            return ResponseEntity.status(403).body("Access denied");
+        }
         try {
             Rental rental = rentalService.createRentalFromReservation(reservationId);
             return ResponseEntity.ok(rental);
@@ -36,16 +40,19 @@ public class RentalController {
         }
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Rental>> getUserRentals(@PathVariable Integer userId) {
-        List<Rental> rentals = rentalService.getRentalsByUserId(userId);
-        return ResponseEntity.ok(rentals);
+    @GetMapping("/user")
+    public ResponseEntity<List<RentalDto>> getUserRentals(@RequestHeader("X-User-Id") String id) {
+        List<Rental> rentals = rentalService.getRentalsByUserId(Integer.valueOf(id));
+        return ResponseEntity.ok(rentals.stream().map(RentalDto::new).toList());
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Rental>> getAllRentals() {
+    public ResponseEntity<List<RentalDto>> getAllRentals(@RequestHeader("X-User-Role") String role) {
+        if (!role.equals("ADMIN") && !role.equals("MANAGER")) {
+            return ResponseEntity.status(403).body(null);
+        }
         List<Rental> rentals = rentalService.getAllRentals();
-        return ResponseEntity.ok(rentals);
+        return ResponseEntity.ok(rentals.stream().map(RentalDto::new).toList());
     }
 
     @GetMapping("/status/{status}")
@@ -60,11 +67,19 @@ public class RentalController {
         return ResponseEntity.ok(activeRentals);
     }
 
+    @GetMapping("/active/count")
+    public ResponseEntity<Long> countActiveRentals() {
+        Long count = rentalService.countRentalsByStatus(RentalStatus.IN_PROGRESS);
+        return ResponseEntity.ok(count);
+    }
+
     @PutMapping("/{id}/complete")
-    public ResponseEntity<?> completeRental(@PathVariable Long id) {
+    public ResponseEntity<?> completeRental(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
+        if (!role.equals("MANAGER") && !role.equals("ADMIN")) {
+            return ResponseEntity.status(403).body("Access denied");
+        }
         try {
-            Rental rental = rentalService.completeRental(id);
-            return ResponseEntity.ok(rental);
+            return ResponseEntity.ok(rentalService.completeRental(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

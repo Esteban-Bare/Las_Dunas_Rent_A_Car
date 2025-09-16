@@ -4,23 +4,27 @@
 :host {
   display: block;
   padding: 2rem;
-  margin-top: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
+/* Header styling */
 h3 {
-  margin-bottom: 1.5rem;
-  color: #333;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
 
-/* Form styling */
+/* Form styling - simplified colors */
 form {
-  max-width: 600px;
-  margin-bottom: 2rem;
+  background: #4a5568;
+  border-radius: 15px;
   padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: white;
 }
 
 .form-group {
@@ -28,13 +32,57 @@ form {
 }
 
 label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
   display: block;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  background: white;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+  outline: none;
+}
+
+.text-danger {
+  color: #fc8181 !important;
+  font-weight: 500;
+  margin-top: 0.25rem;
 }
 
 button[type="submit"] {
+  background: #4299e1;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
   margin-top: 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background: #3182ce;
+  transform: translateY(-1px);
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Search results styling */
@@ -42,47 +90,76 @@ button[type="submit"] {
   margin-top: 2rem;
 }
 
+.search-results > h3 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
 .location-section {
   margin-bottom: 2.5rem;
 }
 
 .location-title {
+  background: #4a5568;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
   font-weight: 600;
-  border-bottom: 2px solid #9ECAE1;
-  padding-bottom: 0.5rem;
+  font-size: 1.1rem;
   margin-bottom: 1.25rem;
 }
 
+/* Smaller vehicles grid */
 .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
 }
 
+/* Smaller vehicle cards */
 .vehicle-card {
-  background-color: white;
-  border-radius: 8px;
-  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.vehicle-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #4299e1;
 }
 
 .vehicle-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .vehicle-card h5 {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 0.4rem;
 }
 
 .vehicle-category {
   display: inline-block;
-  background-color: #e9ecef;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  background: #4299e1;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
   margin-bottom: 1rem;
 }
 
@@ -91,36 +168,130 @@ button[type="submit"] {
 }
 
 .price-per-day {
-  font-weight: 600;
-  font-size: 1.1rem;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #2c3e50;
+  margin-bottom: 0.6rem;
 }
 
 .price-details {
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  background-color: #f8f9fa;
-  border-radius: 6px;
+  background: #f7fafc;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .price-details p {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.4rem;
+  color: #4a5568;
+  font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .total-price {
-  font-weight: 600;
-  color: #333;
-  border-top: 1px solid #dee2e6;
-  padding-top: 0.5rem;
-  margin-top: 0.5rem;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+  font-size: 1rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.6rem;
+  margin-top: 0.6rem;
 }
 
+/* Smaller vehicle card button */
 .vehicle-card .btn {
   width: 100%;
+  background: #4299e1;
+  border: none;
+  padding: 0.7rem 1.25rem;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.vehicle-card .btn:hover {
+  background: #3182ce;
+  transform: translateY(-1px);
+}
+
+/* Login section styling */
+.login-section {
+  text-align: center;
+  padding: 2rem;
+  background: #4a5568;
+  border-radius: 15px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-section h3 {
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.login-section .btn {
+  background: white;
+  color: #4a5568;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.login-section .btn:hover {
+  background: #f7fafc;
+  transform: translateY(-1px);
+}
+
+/* Empty state styling */
+.search-results p {
+  text-align: center;
+  font-size: 1rem;
+  color: #718096;
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-radius: 10px;
+  border: 2px dashed #cbd5e0;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
+  :host {
+    padding: 1rem;
+  }
+
   .vehicles-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  form {
+    padding: 1.25rem;
+  }
+
+  .vehicle-card {
+    padding: 1rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  .location-title {
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .price-per-day {
+    font-size: 1.2rem;
+  }
+
+  .vehicle-card h5 {
+    font-size: 1rem;
   }
 }

@@ -1,0 +1,186 @@
+<div class="rentals-container">
+  <div class="header">
+    <h1>My Rentals</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="goBackToDashboard()">
+        ← Back to Dashboard
+      </button>
+      <button class="btn btn-primary" (click)="navigateToReservations()">
+        View Reservations
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading your rentals...</p>
+    </div>
+  }
+
+  @if (error && !isLoading) {
+    <div class="error-message">
+      <div class="alert alert-danger">
+        <h4>Error</h4>
+        <p>{{ error }}</p>
+        <button class="btn btn-outline-danger" (click)="loadRentals()">
+          Try Again
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && !error) {
+    <div class="rentals-content">
+      @if (rentals.length > 0) {
+        <div class="rentals-summary">
+          <p>You have <strong>{{ rentals.length }}</strong> rental(s)</p>
+        </div>
+      }
+
+      @if (rentals.length === 0) {
+        <div class="no-rentals">
+          <div class="empty-state">
+            <div class="empty-icon">🚗</div>
+            <h3>No Rentals Found</h3>
+            <p>You don't have any active or completed rentals yet.</p>
+            <button class="btn btn-primary" (click)="navigateToReservations()">
+              View Your Reservations
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (rentals.length > 0) {
+        <div class="rentals-grid">
+          @for (rental of rentals; track rental.id) {
+            <div class="rental-card">
+              <div class="card-header">
+                <div class="rental-id">
+                  <span class="label">Rental #</span>
+                  <span class="value">{{ rental.id }}</span>
+                </div>
+                <div class="rental-status">
+                  <span class="status-badge" [ngClass]="getStatusClass(rental.status)">
+                    {{ rental.status }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <div class="vehicle-info">
+                  <h4>{{ rental.vehicle.brand }} {{ rental.vehicle.model }}</h4>
+                  <p class="category">{{ rental.vehicle.category }}</p>
+                </div>
+
+                <div class="rental-details">
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <span class="label">📍 Pickup Location:</span>
+                      <span class="value">{{ rental.store.address }}</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <span class="label">📅 Start Date:</span>
+                      <span class="value">{{ formatDate(rental.startDate) | date:'medium' }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">📅 End Date:</span>
+                      <span class="value">{{ formatDate(rental.endDate) | date:'medium' }}</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <span class="label">💰 Price per Day:</span>
+                      <span class="value">{{ rental.vehicle.pricePerDay }}€</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">💳 Total Rental Price:</span>
+                      <span class="value total-price">{{ rental.totalPrice }}€</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <span class="label">🕒 Created:</span>
+                      <span class="value">{{ formatDate(rental.createdAt) | date:'short' }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">🔄 Last Updated:</span>
+                      <span class="value">{{ formatDate(rental.updatedAt) | date:'short' }}</span>
+                    </div>
+                  </div>
+
+                  @if (rental.reservation) {
+                    <div class="detail-row">
+                      <div class="detail-item">
+                        <span class="label">📋 From Reservation:</span>
+                        <span class="value">#{{ rental.reservation.id }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="payment-status">
+                  <div class="payment-header">
+                    <span class="label">💳 Payment Status:</span>
+                    <span class="payment-badge" [ngClass]="getPaymentStatusClass(getPaymentStatus(rental))">
+                      {{ getPaymentStatus(rental) | titlecase }}
+                    </span>
+                  </div>
+
+                  @if (rental.payment) {
+                    <div class="payment-info">
+                      <div class="payment-item">
+                        <span class="payment-type">{{ rental.payment.paymentType }}</span>
+                        <span class="payment-amount">{{ rental.payment.amount }}€</span>
+                        <span class="payment-status-small" [ngClass]="'status-' + rental.payment.paymentStatus.toLowerCase()">
+                          {{ rental.payment.paymentStatus }}
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="card-footer">
+                @if (canReturnVehicle(rental)) {
+                  <button
+                    class="btn btn-success me-2"
+                    (click)="returnVehicle(rental.id)">
+                    Return Vehicle
+                  </button>
+                }
+
+                @if (canCancelRental(rental)) {
+                  <button
+                    class="btn btn-danger"
+                    (click)="cancelRental(rental.id)">
+                    Cancel Rental
+                  </button>
+                }
+
+                @if (!canReturnVehicle(rental) && !canCancelRental(rental)) {
+                  <span class="action-info">
+                    @if (rental.status === 'COMPLETED') {
+                      Rental completed successfully.
+                    } @else if (rental.status === 'CANCELLED') {
+                      Rental was cancelled.
+                    } @else if (rental.status === 'RETURNED') {
+                      Vehicle returned.
+                    } @else if (rental.status === 'OVERDUE') {
+                      Rental is overdue - please contact support.
+                    }
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

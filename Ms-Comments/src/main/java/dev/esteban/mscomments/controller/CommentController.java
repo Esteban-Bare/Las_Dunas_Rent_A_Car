@@ -36,4 +36,15 @@ public class CommentController {
             return ResponseEntity.status(500).body("Internal server error");
         }
     }
+
+    @GetMapping("/vehicle/{vehicleId}")
+    public ResponseEntity<?> getCommentsByVehicleId(@PathVariable String vehicleId) {
+        try {
+            return ResponseEntity.ok().body(commentService.getCommentsByVehicleId(vehicleId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal server error");
+        }
+    }
 }

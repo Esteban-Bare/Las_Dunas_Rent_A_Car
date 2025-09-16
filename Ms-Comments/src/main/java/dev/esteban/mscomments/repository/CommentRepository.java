@@ -13,4 +13,6 @@ public interface CommentRepository extends MongoRepository<Comment, Long> {
     Comment findById(String commentId);
 
     void deleteById(String commentId);
+
+    List<Comment> findByVehicleId(String vehicleId);
 }

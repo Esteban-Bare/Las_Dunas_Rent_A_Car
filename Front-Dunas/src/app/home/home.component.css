@@ -1,0 +1,181 @@
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.brand-highlight {
+  color: #ffd700;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.hero-actions .btn {
+  padding: 12px 30px;
+}
+
+.hero-image {
+  text-align: center;
+  font-size: 15rem;
+  opacity: 0.3;
+}
+
+.services-section {
+  background: white;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  color: #6c757d;
+}
+
+.service-card {
+  padding: 2rem 1.5rem;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.service-icon {
+  font-size: 3rem;
+  color: #667eea;
+  margin-bottom: 1.5rem;
+}
+
+.service-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.service-description {
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+/* Featured Vehicles Section */
+.featured-section {
+  background: #f8f9fa;
+}
+
+.vehicle-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.vehicle-image {
+  padding: 2rem;
+  text-align: center;
+  background: #f8f9fa;
+}
+
+.vehicle-info {
+  padding: 1.5rem;
+}
+
+.vehicle-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.vehicle-category {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.vehicle-price {
+  display: flex;
+  align-items: baseline;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.period {
+  color: #6c757d;
+  margin-left: 0.5rem;
+}
+
+/* CTA Section */
+.cta-section {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  color: white;
+}
+
+.cta-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.cta-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.cta-actions .btn {
+  padding: 12px 30px;
+  margin: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .hero-actions .btn,
+  .cta-actions .btn {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+}

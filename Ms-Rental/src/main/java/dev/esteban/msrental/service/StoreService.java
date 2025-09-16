@@ -28,4 +28,10 @@ public class StoreService {
                 .filter(store -> store.getCity().equalsIgnoreCase(cityName))
                 .toList();
     }
+
+
+    @Transactional(readOnly = true)
+    public List<Store> getAllStores() {
+        return storeRepository.findAll();
+    }
 }

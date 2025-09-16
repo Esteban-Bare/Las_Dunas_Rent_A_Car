@@ -1,0 +1,155 @@
+<div class="reservations-container">
+  <div class="header">
+    <button class="back-btn secondary" (click)="goBackToBackoffice()">
+      ← Back to Backoffice
+    </button>
+    <h1>
+      <span class="icon">📋</span>
+      Reservation Management
+    </h1>
+    <p class="subtitle">Manage reservations and create rentals</p>
+
+    <div class="filter-section">
+      <label class="filter-toggle">
+        <input
+          type="checkbox"
+          [(ngModel)]="showTodayOnly"
+          (change)="onFilterChange()">
+        <span class="toggle-text">Show only today's reservations</span>
+      </label>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading reservations...</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="loadReservations()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading && !error) {
+    <div class="content">
+      <div class="reservations-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ reservations.length }}</span>
+          <span class="stat-label">Total Reservations</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ todayReservationsCount }}</span>
+          <span class="stat-label">Today</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ completedReservationsCount }}</span>
+          <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ rentalsCreatedCount }}</span>
+          <span class="stat-label">Rentals Created</span>
+        </div>
+      </div>
+
+      <div class="reservations-table-container">
+        <table class="reservations-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Dates</th>
+            <th>Total Price</th>
+            <th>Payment Status</th>
+            <th>Status</th>
+            <th>Rental</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (reservation of filteredReservations; track reservation.id) {
+              <tr class="reservation-row">
+                <td class="reservation-id">{{ reservation.id }}</td>
+                <td class="customer-info">
+                  <div class="customer-details">
+                    <span class="customer-name">{{ reservation.firstName }} {{ reservation.lastName }}</span>
+                  </div>
+                </td>
+                <td class="vehicle-info">
+                  <div class="vehicle-details">
+                    <span class="vehicle-model">{{ reservation.vehicleModel }}</span>
+                    <span class="vehicle-plate">{{ reservation.vehiclePlate }}</span>
+                  </div>
+                </td>
+                <td class="dates-info">
+                  <div class="date-range">
+                    <span class="date-start">{{ reservation.requestedStartDate | date:'short' }}</span>
+                    <span class="date-separator">→</span>
+                    <span class="date-end">{{ reservation.requestedEndDate | date:'short' }}</span>
+                  </div>
+                </td>
+                <td class="total-price">€{{ reservation.totalPrice }}</td>
+                <td class="payment-status">
+                  <span class="payment-badge" [class]="getPaymentStatusClass(reservation.paymentStatuses)">
+                    {{ getPaymentStatusText(reservation.paymentStatuses) }}
+                  </span>
+                </td>
+                <td class="reservation-status">
+                  <span class="status-badge" [class]="getStatusBadgeClass(reservation.reservationStatus)">
+                    {{ reservation.reservationStatus }}
+                  </span>
+                </td>
+                <td class="rental-status">
+                  <span class="rental-badge" [class]="reservation.hasRental ? 'has-rental' : 'no-rental'">
+                    {{ reservation.hasRental ? '✓ Created' : '✗ None' }}
+                  </span>
+                </td>
+                <td class="reservation-actions">
+                  @if (canCreateRental(reservation)) {
+                    <button
+                      class="create-rental-btn"
+                      (click)="createRental(reservation.id)">
+                      Create Rental
+                    </button>
+                  } @else {
+                    <span class="action-disabled">
+                      @if (reservation.hasRental) {
+                        Rental exists
+                      } @else if (reservation.reservationStatus !== 'COMPLETED') {
+                        Not completed
+                      } @else {
+                        Payment pending
+                      }
+                    </span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="9" class="empty-state">
+                  <div class="empty-content">
+                    <span class="empty-icon">📋</span>
+                    <h3>No reservations found</h3>
+                    <p>
+                      @if (showTodayOnly) {
+                        No reservations found for today.
+                      } @else {
+                        There are no reservations in the system yet.
+                      }
+                    </p>
+                    <button class="refresh-btn" (click)="loadReservations()">Refresh</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

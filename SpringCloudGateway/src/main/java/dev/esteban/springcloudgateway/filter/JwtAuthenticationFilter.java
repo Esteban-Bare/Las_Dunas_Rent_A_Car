@@ -27,8 +27,14 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/refresh-token",
-            "/api/auth/logout"
+            "/api/auth/logout",
+            "/api/rental/vehicles/common/**",
+            "/api/rental/categories/names",
+            "/api/rental/brands/names",
+            "/api/comments/vehicle/**",
+            "/api/rental/stores/all"
     );
+
 
     @Autowired
     public JwtAuthenticationFilter(WebClient.Builder webClientBuilder) {
@@ -122,6 +128,17 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
     private boolean isSecured(ServerHttpRequest request) {
         String path = request.getURI().getPath();
-        return excludedPaths.stream().noneMatch(path::contains);
+        return excludedPaths.stream().noneMatch(excludedPath -> matchesPattern(excludedPath, path));
+    }
+
+    private boolean matchesPattern(String pattern, String path) {
+        if (pattern.endsWith("/**")) {
+            String prefix = pattern.substring(0, pattern.length() - 3);
+            return path.startsWith(prefix);
+        } else if (pattern.contains("*")) {
+            return path.matches(pattern.replace("*", ".*"));
+        } else {
+            return path.equals(pattern);
+        }
     }
 }

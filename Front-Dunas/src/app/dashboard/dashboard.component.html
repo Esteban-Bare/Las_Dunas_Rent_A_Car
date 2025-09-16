@@ -1,1 +1,104 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Welcome back, {{userInfo.firstName}}!</h1>
+    <p class="subtitle">Here's your rental overview</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <p>Loading your dashboard...</p>
+  </div>
+
+  <div class="dashboard-content" *ngIf="!isLoading">
+    <!-- Management Section (Only for Managers/Admins) -->
+    <div class="management-section" *ngIf="isManagerOrAdmin()">
+      <h2>Management Panel</h2>
+      <div class="management-card">
+        <div class="management-icon">⚙️</div>
+        <div class="management-content">
+          <h3>Backoffice Access</h3>
+          <p>Access management tools and system administration</p>
+          <button class="btn btn-management" (click)="navigateToBackoffice()">
+            <span class="btn-icon">🏢</span>
+            <span class="btn-text">Go to Backoffice</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-content">
+          <h3>{{dashboardStats.totalReservations}}</h3>
+          <p>Total Reservations</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🚗</div>
+        <div class="stat-content">
+          <h3>{{dashboardStats.activeRentals}}</h3>
+          <p>Active Rentals</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💳</div>
+        <div class="stat-content">
+          <h3>${{dashboardStats.pendingPayments}}</h3>
+          <p>Pending Payments</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <h3>${{dashboardStats.totalSpent}}</h3>
+          <p>Total Spent</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-section">
+      <h2>Quick Actions</h2>
+      <div class="actions-grid">
+        <button class="action-btn primary" (click)="navigateToCreateReservation()">
+          <span class="btn-icon">➕</span>
+          <span class="btn-text">New Reservation</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToReservations()">
+          <span class="btn-icon">📋</span>
+          <span class="btn-text">View Reservations</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToRentals()">
+          <span class="btn-icon">🚗</span>
+          <span class="btn-text">My Rentals</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToPendingPayments()">
+          <span class="btn-icon">💳</span>
+          <span class="btn-text">Pending Payments</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- User Info -->
+    <div class="user-info-section">
+      <h2>Account Information</h2>
+      <div class="user-info-card">
+        <div class="user-detail">
+          <label>Email:</label>
+          <span>{{userInfo.email}}</span>
+        </div>
+        <div class="user-detail">
+          <label>Member Since:</label>
+          <span>{{userInfo.memberSince | date:'MMM yyyy'}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

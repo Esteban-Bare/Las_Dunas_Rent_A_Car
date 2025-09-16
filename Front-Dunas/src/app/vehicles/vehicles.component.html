@@ -1,0 +1,72 @@
+<div class="vehicles-container">
+  <div class="header">
+    <h2>Our Vehicle Fleet</h2>
+  </div>
+
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="category">Category:</label>
+      <select
+        id="category"
+        [(ngModel)]="selectedCategory"
+        (change)="onCategoryChange()"
+        class="filter-select">
+        <option value="">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="brand">Brand:</label>
+      <select
+        id="brand"
+        [(ngModel)]="selectedBrand"
+        (change)="onBrandChange()"
+        class="filter-select">
+        <option value="">All Brands</option>
+        <option *ngFor="let brand of brands" [value]="brand">
+          {{ brand }}
+        </option>
+      </select>
+    </div>
+
+    <button (click)="clearFilters()" class="clear-btn">Clear Filters</button>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <p>Loading vehicles...</p>
+    </div>
+  }
+
+  @if (!isLoading) {
+    <div class="vehicles-grid">
+      @for (vehicle of filteredVehicles; track vehicle.vehicleId) {
+        <div class="vehicle-card">
+          <div class="vehicle-image">
+            <svg width="120" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5H6.5C5.84 5 5.28 5.42 5.08 6.01L3 12V20C3 20.55 3.45 21 4 21H5C5.55 21 6 20.55 6 20V19H18V20C18 20.55 18.45 21 19 21H20C20.55 21 21 20.55 21 20V12L18.92 6.01ZM6.5 16C5.67 16 5 15.33 5 14.5S5.67 13 6.5 13 8 13.67 8 14.5 7.33 16 6.5 16ZM17.5 16C16.67 16 16 15.33 16 14.5S16.67 13 17.5 13 19 13.67 19 14.5 18.33 16 17.5 16ZM5 11L6.5 6.5H17.5L19 11H5Z" fill="#666"/>
+            </svg>
+          </div>
+          <div class="vehicle-info">
+            <h3>{{ vehicle.brand }} {{ vehicle.model }}</h3>
+            <p class="category">{{ vehicle.category }}</p>
+          </div>
+          <div class="vehicle-actions">
+            <button
+              (click)="viewVehicleDetails(vehicle.vehicleId)"
+              class="details-btn">
+              View Details
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="no-results">
+          <p>No vehicles found matching your criteria.</p>
+        </div>
+      }
+    </div>
+  }
+</div>

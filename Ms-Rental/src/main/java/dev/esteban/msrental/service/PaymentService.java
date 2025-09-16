@@ -54,7 +54,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment processPayment(Long paymentId, String paymentMethod) {
+    public String processPayment(Long paymentId, String paymentMethod) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
@@ -62,8 +62,8 @@ public class PaymentService {
         payment.setPaymentStatus(PaymentStatus.COMPLETED);
         payment.setPaymentMethod(paymentMethod);
         payment.setPaymentDate(LocalDateTime.now());
-
-        return paymentRepository.save(payment);
+        paymentRepository.save(payment);
+        return "Payment processed successfully with transaction ID: " + payment.getTransactionId();
     }
 
     @Transactional
@@ -157,8 +157,31 @@ public class PaymentService {
 
     public BigDecimal getPendingPaymentsByUser(Integer userId) {
         return paymentRepository.findByUserId(userId).stream()
-                .filter(payment -> payment.getPaymentStatus() == PaymentStatus.PENDING)
+                .filter(payment -> payment.getPaymentStatus() == PaymentStatus.PENDING
+                        && payment.getPaymentType() != PaymentType.REFUND
+                        && payment.getPaymentType() != PaymentType.DEPOSIT_RETURN)
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getTotalRevenue() {
+        BigDecimal totalRevenue = paymentRepository.findAll().stream()
+                .filter(payment -> payment.getPaymentStatus() == PaymentStatus.COMPLETED
+                        && payment.getPaymentType() != PaymentType.REFUND
+                        && payment.getPaymentType() != PaymentType.DEPOSIT_RETURN)
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalRefunds = paymentRepository.findAll().stream()
+                .filter(payment -> payment.getPaymentStatus() == PaymentStatus.COMPLETED
+                        && payment.getPaymentType() == PaymentType.REFUND)
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return totalRevenue.add(totalRefunds); // totalRefunds is negative
+    }
+
+    public List<Payment> getAllPayments() {
+        return paymentRepository.findAll();
     }
 }

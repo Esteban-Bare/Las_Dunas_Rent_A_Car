@@ -1,0 +1,116 @@
+<div class="vehicles-container">
+  <div class="header">
+    <button class="back-btn secondary" (click)="goBackToBackoffice()">
+      ← Back to Backoffice
+    </button>
+    <h1>
+      <span class="icon">🚗</span>
+      Vehicle Management
+    </h1>
+    <p class="subtitle">Manage vehicle inventory and status updates</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading vehicles...</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="loadVehicles()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading && !error) {
+    <div class="content">
+      <div class="vehicles-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ vehicles.length }}</span>
+          <span class="stat-label">Total Vehicles</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ this.availableCount }}</span>
+          <span class="stat-label">Available</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ this.rentedCount }}</span>
+          <span class="stat-label">Rented</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ this.maintenanceCount }}</span>
+          <span class="stat-label">Maintenance</span>
+        </div>
+      </div>
+
+      <div class="vehicles-table-container">
+        <table class="vehicles-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Vehicle</th>
+            <th>Category</th>
+            <th>Plate Number</th>
+            <th>Price/Day</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (vehicle of vehicles; track vehicle.vehicleId) {
+              <tr class="vehicle-row">
+                <td class="vehicle-id">{{ vehicle.vehicleId }}</td>
+                <td class="vehicle-info">
+                  <div class="vehicle-details">
+                    <span class="vehicle-brand">{{ vehicle.brand }}</span>
+                    <span class="vehicle-model">{{ vehicle.model }}</span>
+                  </div>
+                </td>
+                <td class="vehicle-category">{{ vehicle.category }}</td>
+                <td class="vehicle-plate">{{ vehicle.plateNumber }}</td>
+                <td class="vehicle-price">€{{ vehicle.pricePerDay }}</td>
+                <td class="vehicle-status">
+                  <span class="status-badge" [class]="getStatusBadgeClass(vehicle.status)">
+                    {{ vehicle.status }}
+                  </span>
+                </td>
+                <td class="vehicle-actions">
+                  <div class="action-group">
+                    <select
+                      class="status-select"
+                      [(ngModel)]="selectedStatus[vehicle.vehicleId]"
+                      [value]="vehicle.status">
+                      @for (status of availableStatuses; track status) {
+                        <option [value]="status">{{ status }}</option>
+                      }
+                    </select>
+                    <button
+                      class="update-btn"
+                      (click)="updateVehicleStatus(vehicle.vehicleId)"
+                      [disabled]="selectedStatus[vehicle.vehicleId] === vehicle.status">
+                      Update
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-state">
+                  <div class="empty-content">
+                    <span class="empty-icon">🚗</span>
+                    <h3>No vehicles found</h3>
+                    <p>There are no vehicles in the system yet.</p>
+                    <button class="refresh-btn" (click)="loadVehicles()">Refresh</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

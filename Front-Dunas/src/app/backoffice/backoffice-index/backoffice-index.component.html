@@ -1,0 +1,90 @@
+<div class="backoffice-container">
+  <div class="header">
+    <button class="back-btn" (click)="goBackToDashboard()">
+      ← Back to Dashboard
+    </button>
+    <h1>
+      <span class="role-badge" [ngClass]="userRole?.toLowerCase()">{{userRole}}</span>
+      Backoffice Management
+    </h1>
+    <p class="subtitle">
+      {{isAdmin ? 'Full system administration and monitoring' : 'Management tools and operations'}}
+    </p>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading backoffice data...</p>
+  </div>
+
+  <div class="content" *ngIf="!isLoading">
+    <!-- System Overview Stats -->
+    <div class="section">
+      <h2>System Overview</h2>
+      <div class="stats-grid">
+        <div class="stat-card" *ngIf="isAdmin">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h3>{{systemStats.totalUsers}}</h3>
+            <p>Total Users</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🚗</div>
+          <div class="stat-info">
+            <h3>{{systemStats.totalVehicles}}</h3>
+            <p>Total Vehicles</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🔑</div>
+          <div class="stat-info">
+            <h3>{{systemStats.totalActiveRentals}}</h3>
+            <p>Active Rentals</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h3>€{{systemStats.totalRevenue.toFixed(2)}}</h3>
+            <p>Total Revenue</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section">
+      <h2>Quick Actions</h2>
+      <div class="actions-grid">
+        <button class="action-btn" *ngIf="isAdmin" (click)="navigateToUserManagement()">
+          <span class="btn-icon">👥</span>
+          <span class="btn-text">Manage Users</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToVehicleManagement()">
+          <span class="btn-icon">🚗</span>
+          <span class="btn-text">Manage Vehicles</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToReservationManagement()">
+          <span class="btn-icon">📅</span>
+          <span class="btn-text">Manage Reservations</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToRentalManagement()">
+          <span class="btn-icon">🔑</span>
+          <span class="btn-text">Manage Rentals</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToPaymentManagement()">
+          <span class="btn-icon">💳</span>
+          <span class="btn-text">Manage Payments</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

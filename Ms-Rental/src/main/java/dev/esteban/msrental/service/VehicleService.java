@@ -30,9 +30,11 @@ public class VehicleService {
 
     @Autowired
     private MsPricingFeignClient msPricingFeignClient;
+    @Autowired
+    private VehicleRepository vehicleRepository;
 
 
-    public ResponseEntity<?>  getAvailableCars(VehicleSearchDto vehicleSearchDto) {
+    public ResponseEntity<?> getAvailableCars(VehicleSearchDto vehicleSearchDto) {
         List<Store> stores = storeService.getStoresByCity(vehicleSearchDto.getCity());
         if (stores.isEmpty()) {
             return ResponseEntity.badRequest().body("No stores available in this city");
@@ -41,30 +43,52 @@ public class VehicleService {
         stores.forEach(store -> {
             VehiclePerStoreDto vehiclePerStoreDto = new VehiclePerStoreDto();
             Map<String, List<VehicleDto>> storeVehicles = new HashMap<>();
-            List<VehicleDto> vehicles = store.getVehicles().stream().filter(vehicle -> {
-                boolean isAvailable = vehicleIsAvailable(vehicle);
-                boolean isNotReserved = vehicleIsReservedBetweenTwoDates(vehicle, vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour());
-                return isAvailable && isNotReserved;
-            }).map(vehicle -> {
-                try {
-                    ResponseEntity<PriceDto> response = msPricingFeignClient
-                     .getPricesByCar(new VehiclePriceDto(vehicle.getId(),
-                             vehicle.getCategory().getName(), vehicle.getPricePerDay(), vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour()));
-                    if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                        PriceDto pricesDto = response.getBody();
-                        return new VehicleDto(vehicle.getId(), vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), pricesDto);
-                    } else {
-                        return new VehicleDto(vehicle.getId(), vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), null);
-                    }
-                } catch (Exception e) {
-                    return new VehicleDto(vehicle.getId(), vehicle.getModel(), vehicle.getBrand().getName(), vehicle.getCategory().getName(),vehicle.getPricePerDay(), null);
-                }})
+
+            // Filter available vehicles and group by model+brand
+            Map<String, Vehicle> uniqueVehicles = store.getVehicles().stream()
+                    .filter(vehicle -> {
+                        boolean isAvailable = vehicleIsAvailable(vehicle);
+                        boolean isNotReserved = vehicleIsReservedBetweenTwoDates(vehicle,
+                                vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour());
+                        return isAvailable && isNotReserved;
+                    })
+                    .collect(Collectors.toMap(
+                            vehicle -> vehicle.getBrand().getName() + "-" + vehicle.getModel(),
+                            vehicle -> vehicle,
+                            (existing, replacement) -> existing // Keep first occurrence
+                    ));
+
+            List<VehicleDto> vehicles = uniqueVehicles.values().stream()
+                    .map(vehicle -> {
+                        try {
+                            ResponseEntity<PriceDto> response = msPricingFeignClient
+                                    .getPricesByCar(new VehiclePriceDto(vehicle.getId(),
+                                            vehicle.getCategory().getName(), vehicle.getPricePerDay(),
+                                            vehicleSearchDto.getStartDateHour(), vehicleSearchDto.getEndDateHour()));
+                            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                                PriceDto pricesDto = response.getBody();
+                                return new VehicleDto(vehicle.getId(), vehicle.getModel(),
+                                        vehicle.getBrand().getName(), vehicle.getCategory().getName(),
+                                        vehicle.getPricePerDay(), pricesDto);
+                            } else {
+                                return new VehicleDto(vehicle.getId(), vehicle.getModel(),
+                                        vehicle.getBrand().getName(), vehicle.getCategory().getName(),
+                                        vehicle.getPricePerDay(), null);
+                            }
+                        } catch (Exception e) {
+                            return new VehicleDto(vehicle.getId(), vehicle.getModel(),
+                                    vehicle.getBrand().getName(), vehicle.getCategory().getName(),
+                                    vehicle.getPricePerDay(), null);
+                        }
+                    })
                     .collect(Collectors.toList());
+
             storeVehicles.put(store.getName(), vehicles);
             vehiclePerStoreDto.setStoreId(store.getId());
             vehiclePerStoreDto.setStoreVehicles(storeVehicles);
             list.add(vehiclePerStoreDto);
         });
+
         if (list.isEmpty()) {
             return ResponseEntity.badRequest().body("No vehicles available in this city");
         }
@@ -87,5 +111,15 @@ public class VehicleService {
                 bufferedEndDate
         );
         return overlappingReservations.isEmpty();
+    }
+
+    public ResponseEntity<?> updateVehicleStatus(VehicleUpdateStatusDto vehicleUpdateStatusDto) {
+        Vehicle vehicle = vehicleRepository.findById(Long.valueOf(vehicleUpdateStatusDto.getVehicleId())).orElse(null);
+        if (vehicle == null) {
+            return ResponseEntity.badRequest().body("Vehicle not found");
+        }
+        vehicle.setStatus(vehicleUpdateStatusDto.getStatus());
+        vehicleRepository.save(vehicle);
+        return ResponseEntity.ok("Vehicle status updated successfully");
     }
 }

@@ -60,4 +60,8 @@ public class CommentService {
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
     }
+
+    public List<Comment> getCommentsByVehicleId(String vehicleId) {
+        return commentRepository.findByVehicleId(vehicleId);
+    }
 }

@@ -1,0 +1,128 @@
+<div class="rentals-container">
+  <div class="header">
+    <button class="back-btn secondary" (click)="goBackToBackoffice()">
+      ← Back to Backoffice
+    </button>
+    <h1>
+      <span class="icon">🚙</span>
+      Rental Management
+    </h1>
+    <p class="subtitle">Monitor and manage all rental activities</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading rentals...</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="error-message">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="loadRentals()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading && !error) {
+    <div class="content">
+      <div class="rentals-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ totalRentals }}</span>
+          <span class="stat-label">Total Rentals</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ inProgressCount }}</span>
+          <span class="stat-label">In Progress</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ completedCount }}</span>
+          <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ overdueCount }}</span>
+          <span class="stat-label">Overdue</span>
+        </div>
+      </div>
+
+      <div class="rentals-table-container">
+        <table class="rentals-table">
+          <thead>
+          <tr>
+            <th>Rental ID</th>
+            <th>Vehicle</th>
+            <th>Store</th>
+            <th>Period</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (rental of rentals; track rental.id) {
+              <tr class="rental-row">
+                <td class="rental-id">#{{ rental.id }}</td>
+                <td class="vehicle-info">
+                  <div class="vehicle-details">
+                    <span class="vehicle-brand">{{ rental.vehicle.brand }} {{ rental.vehicle.model }}</span>
+                    <span class="vehicle-plate">{{ rental.vehicle.plateNumber }}</span>
+                  </div>
+                </td>
+                <td class="store-info">
+                  <div class="store-details">
+                    <span class="store-name">{{ rental.store.name }}</span>
+                    <span class="store-address">{{ rental.store.address }}</span>
+                  </div>
+                </td>
+                <td class="rental-period">
+                  <div class="period-details">
+                    <span class="period-start">{{ formatDate(rental.startDate) }}</span>
+                    <span class="period-separator">→</span>
+                    <span class="period-end">{{ formatDate(rental.endDate) }}</span>
+                  </div>
+                </td>
+                <td class="rental-price">€{{ rental.totalPrice }}</td>
+                <td class="rental-status">
+                  <span class="status-badge" [class]="getStatusBadgeClass(rental.status)">
+                    {{ rental.status }}
+                  </span>
+                </td>
+                <td class="rental-created">{{ formatDate(rental.createdAt) }}</td>
+                <td class="rental-actions">
+                  @if (canCompleteRental(rental.status)) {
+                    <button
+                      class="complete-btn"
+                      (click)="completeRental(rental.id)"
+                      [disabled]="completingRentalId === rental.id">
+                      @if (completingRentalId === rental.id) {
+                        <span class="button-spinner"></span>
+                        Completing...
+                      } @else {
+                        Complete
+                      }
+                    </button>
+                  } @else {
+                    <span class="no-actions">No actions available</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-state">
+                  <div class="empty-content">
+                    <span class="empty-icon">🚙</span>
+                    <h3>No rentals found</h3>
+                    <p>There are no rentals in the system yet.</p>
+                    <button class="refresh-btn" (click)="loadRentals()">Refresh</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

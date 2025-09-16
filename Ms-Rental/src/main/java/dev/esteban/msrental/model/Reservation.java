@@ -52,6 +52,9 @@ public class Reservation {
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private Set<Rental> rentals;
 
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     public Reservation(Integer userId, Vehicle vehicle, Store store, LocalDateTime requestedStartDate, LocalDateTime requestedEndDate, BigDecimal reservationPrice, BigDecimal insurancePrice, ReservationStatus reservationStatus) {
         this.userId = userId;
         this.vehicle = vehicle;

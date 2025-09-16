@@ -48,6 +48,13 @@ public class SpringCloudGatewayApplication {
                         )
                         .uri("lb://security")
                 )
+                .route("comment-service", r -> r.path("/comments/**")
+                        .filters(f -> f
+                                .prefixPath("/api")
+                                .addResponseHeader("x-Powered-By", "Esteban's API")
+                        )
+                        .uri("lb://comments")
+                )
                 .build();
     }
 

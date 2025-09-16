@@ -1,59 +1,57 @@
-<header class="navbar navbar-expand-lg navbar-dark shadow sticky-top">
+<header class="app-navbar navbar navbar-expand-lg navbar-light">
   <div class="container">
-    <a class="navbar-brand fw-bold" routerLink="/">
+    <a class="brand fw-bold" routerLink="/">
       <i class="bi bi-car-front me-2"></i>Las Dunas Rent A Car
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#appNav"
+            aria-controls="appNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
+
+    <div class="collapse navbar-collapse" id="appNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
           <a class="nav-link" routerLink="/" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active">
-            <i class="bi bi-house-door me-1"></i>Accueil
+            <i class="bi bi-house-door me-1"></i>Home
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/cars" routerLinkActive="active">
-            <i class="bi bi-car-front-fill me-1"></i>Nos Véhicules
+          <a class="nav-link" routerLink="/vehicles" routerLinkActive="active">
+            <i class="bi bi-car-front-fill me-1"></i>Our Vehicles
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/locations" routerLinkActive="active">
-            <i class="bi bi-geo-alt me-1"></i>Agences
+          <a class="nav-link" routerLink="/stores" routerLinkActive="active">
+            <i class="bi bi-geo-alt me-1"></i>Branches
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/reservations" routerLinkActive="active">
-            <i class="bi bi-calendar-check me-1"></i>Réservations
+            <i class="bi bi-calendar-check me-1"></i>Reservations
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/contact" routerLinkActive="active">
-            <i class="bi bi-envelope me-1"></i>Contact
-          </a>
-        </li>
+
         @if (authService.isLoggedIn()) {
           <li class="nav-item">
             <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
-              <i class="bi bi-person-circle me-1"></i>Mon Compte
+              <i class="bi bi-person-circle me-1"></i>My Account
             </a>
           </li>
           <li class="nav-item">
             <button class="nav-link btn btn-link" (click)="authService.logout()">
-              <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
+              <i class="bi bi-box-arrow-right me-1"></i>Logout
             </button>
           </li>
         } @else {
           <li class="nav-item">
             <a class="nav-link" routerLink="/login" routerLinkActive="active">
-              <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="/register" routerLinkActive="active">
-              <i class="bi bi-person-plus me-1"></i>S'inscrire
+              <i class="bi bi-person-plus me-1"></i>Sign Up
             </a>
           </li>
         }
@@ -62,6 +60,6 @@
   </div>
 </header>
 
-<main>
+<div class="main-content">
   <router-outlet></router-outlet>
-</main>
+</div>

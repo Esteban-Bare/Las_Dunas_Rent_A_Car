@@ -1,0 +1,167 @@
+<div class="reservations-container">
+  <div class="header">
+    <h1>My Reservations</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="goBackToDashboard()">
+        ← Back to Dashboard
+      </button>
+      <button class="btn btn-primary" (click)="navigateToCreateReservation()">
+        + New Reservation
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-spinner" >
+      <div class="spinner"></div>
+      <p>Loading your reservations...</p>
+    </div>
+  }
+
+  @if (error && !isLoading) {
+    <div class="error-message">
+      <div class="alert alert-danger">
+        <h4>Error</h4>
+        <p>{{ error }}</p>
+        <button class="btn btn-outline-danger" (click)="loadReservations()">
+          Try Again
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && !error) {
+    <div class="reservations-content">
+      @if (reservations.length > 0) {
+        <div class="reservations-summary">
+          <p>You have <strong>{{ reservations.length }}</strong> reservation(s)</p>
+        </div>
+      }
+
+
+      @if (reservations.length === 0) {
+        <div class="no-reservations">
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3>No Reservations Found</h3>
+            <p>You haven't made any reservations yet.</p>
+            <button class="btn btn-primary" (click)="navigateToCreateReservation()">
+              Make Your First Reservation
+            </button>
+          </div>
+        </div>
+      }
+
+
+      @if (reservations.length > 0) {
+        <div class="reservations-grid">
+          @for (reservation of reservations; track reservation.id) {
+            <div class="reservation-card">
+              <div class="card-header">
+                <div class="reservation-id">
+                  <span class="label">Reservation #</span>
+                  <span class="value">{{ reservation.id }}</span>
+                </div>
+                <div class="reservation-status">
+            <span class="status-badge" [ngClass]="getStatusClass(reservation.status, reservation)">
+              {{ reservation.status }}
+            </span>
+                </div>
+              </div>
+
+              <div class="card-body">
+                <div class="vehicle-info">
+                  <h4>{{ reservation.vehicle.brand }} {{ reservation.vehicle.model }}</h4>
+                  <p class="category">{{ reservation.vehicle.category }}</p>
+                </div>
+
+                <div class="reservation-details">
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <span class="label">📍 Pickup Location:</span>
+                      <span class="value">{{ reservation.store.address }}</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <span class="label">📅 Start Date:</span>
+                      <span class="value">{{ reservation.requested_start_date | date:'medium' }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">📅 End Date:</span>
+                      <span class="value">{{ reservation.requested_end_date | date:'medium' }}</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <span class="label">💰 Price per Day:</span>
+                      <span class="value">{{ reservation.vehicle.pricePerDay }}€</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">💳 Total Price Of Reservation:</span>
+                      <span class="value total-price">{{ getTotalPaid(reservation) }}€</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <span class="label">🕒 Created:</span>
+                      <span class="value">{{ reservation.createdAt | date:'short' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="payment-status">
+                  <div class="payment-header">
+                    <span class="label">💳 Payment Status:</span>
+                    <span class="payment-badge" [ngClass]="getPaymentStatusClass(getPaymentStatus(reservation))">
+                {{ getPaymentStatus(reservation) | titlecase }}
+              </span>
+                  </div>
+
+                  <div class="payments-list" *ngIf="reservation.payments && reservation.payments.length > 0">
+                    <div class="payment-item" *ngFor="let payment of reservation.payments">
+                      <span class="payment-type">{{ payment.paymentType }}</span>
+                      <span class="payment-amount">{{ payment.amount }}€</span>
+                      <span class="payment-status-small" [ngClass]="'status-' + payment.paymentStatus.toLowerCase()">
+                  {{ payment.paymentStatus }}
+                </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                @if (!reservation.hasRental && canCancelReservation(reservation)) {
+                  <button
+                    class="btn btn-danger"
+                    (click)="cancelReservation(reservation.id)"
+                    [disabled]="!canCancelReservation(reservation)">
+                    Cancel Reservation
+                  </button>
+                }
+
+
+                @if (!canCancelReservation(reservation)) {
+                  <span class="cancel-info" >
+            Cannot cancel {{ reservation.status.toLowerCase() }} reservation @if (reservation.status === 'COMPLETED') { without insurance
+                  }.
+          </span>
+                } @else if (reservation.hasRental) {
+                  <span class="cancel-info">
+            Cannot cancel reservation with active rental.
+                  </span>
+                }
+
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

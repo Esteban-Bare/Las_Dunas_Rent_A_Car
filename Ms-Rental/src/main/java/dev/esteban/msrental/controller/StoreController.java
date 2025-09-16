@@ -1,5 +1,6 @@
 package dev.esteban.msrental.controller;
 
+import dev.esteban.msrental.dto.StoreDto;
 import dev.esteban.msrental.model.Store;
 import dev.esteban.msrental.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,5 +20,11 @@ public class StoreController {
     @Transactional(readOnly = true)
     public List<Store> getStoresByCity(@RequestParam String city) {
         return storeService.getStoresByCity(city);
+    }
+
+    @GetMapping("/all")
+    @Transactional(readOnly = true)
+    public List<StoreDto> getAllStores() {
+        return storeService.getAllStores().stream().map(StoreDto::new).toList();
     }
 }

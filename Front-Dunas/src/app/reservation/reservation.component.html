@@ -39,7 +39,9 @@
         <small class="text-danger">End date and time is required</small>
       }
     </div>
-
+    @if (availableCarsForm.hasError('dateRange') && (availableCarsForm.get('startDate')?.touched || availableCarsForm.get('endDate')?.touched)) {
+      <small class="text-danger">End date must be after start date</small>
+    }
     <button type="submit" [disabled]="availableCarsForm.invalid" class="btn btn-primary">Search Available Cars</button>
   </form>
 

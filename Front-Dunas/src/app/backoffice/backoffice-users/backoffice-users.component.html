@@ -1,0 +1,65 @@
+<div class="backoffice-users">
+  <div class="header">
+    <button class="back-btn" (click)="goBackToBackoffice()">
+      ← Back to Backoffice
+    </button>
+    <h2>User Management</h2>
+    <p>Manage user roles and view user information</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading users...</p>
+    </div>
+  } @else {
+    <div class="users-table-container">
+      <table class="users-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Member Since</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (user of users; track user.id) {
+            <tr class="user-row">
+              <td>{{ user.id }}</td>
+              <td>{{ user.firstName }} {{ user.lastName }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="role-badge" [class]="'role-' + user.role.toLowerCase()">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td>{{ formatDate(user.createdAt) }}</td>
+              <td>
+                <select
+                  class="role-select"
+                  [value]="user.role"
+                  (change)="updateUserRole(user.id, $any($event.target).value)">
+                  @for (role of availableRoles; track role) {
+                    <option [value]="role">{{ role }}</option>
+                  }
+                </select>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="no-users">
+                <div class="empty-state">
+                  <p>No users found</p>
+                  <button class="refresh-btn" (click)="loadUsers()">Refresh</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
