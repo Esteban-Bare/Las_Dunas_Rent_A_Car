@@ -91,7 +91,6 @@ export class CreateReservationComponent implements OnInit {
         if (response.ok) {
           return response.json();
         } else {
-          this.router.navigate(['/reservations']);
           throw new Error('Failed to create reservation');
         }
       })
@@ -110,7 +109,6 @@ export class CreateReservationComponent implements OnInit {
 
   private preparePaymentPopup(reservationData: any) {
     // Fetch the payments associated with this reservation
-    fetch(`http://localhost:8077/rental/payments/user`, {
       method: 'GET',
       credentials: 'include'
     })
