@@ -1,0 +1,261 @@
+services:
+  mongodb-ms-comments:
+    image: mongo:latest
+    # Remove external port mapping - only internal port 27017 available
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mongodb-comments-data:/data/db
+    healthcheck:
+      test: "mongosh --quiet --host localhost --port 27017 --eval 'db.runCommand({ ping: 1 })'"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    networks:
+      - lasdunasrentacar
+
+  mongodb-ms-promotions:
+    image: mongo:latest
+    # Remove external port mapping
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mongodb-promotions-data:/data/db
+    healthcheck:
+      test: "mongosh --quiet --host localhost --port 27017 --eval 'db.runCommand({ ping: 1 })'"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    networks:
+      - lasdunasrentacar
+
+  mysql-security:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: security_db
+      MYSQL_USER: serviceuser
+      MYSQL_PASSWORD: servicepassword
+    volumes:
+      - mysql-security-data:/var/lib/mysql
+    healthcheck:
+      test: "mysqladmin ping -h localhost -u root -proot"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    networks:
+      - lasdunasrentacar
+
+  mysql-rental:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: las_rental
+      MYSQL_USER: serviceuser
+      MYSQL_PASSWORD: servicepassword
+    volumes:
+      - mysql-rental-data:/var/lib/mysql
+    healthcheck:
+      test: "mysqladmin ping -h localhost -u root -proot"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    networks:
+      - lasdunasrentacar
+
+  config-server:
+    image: estebanx55/lasdunasrentacar-springcloudconfig:latest
+    # Remove external port mapping
+    volumes:
+      - ./env/.env:/env/.env
+    healthcheck:
+      test: "curl --fail --silent localhost:3030/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    networks:
+      - lasdunasrentacar
+
+  eureka:
+    image: estebanx55/lasdunasrentacar-eureka:latest
+    # Remove external port mapping
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8761/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: eureka-config
+    networks:
+      - lasdunasrentacar
+
+  ms-security:
+    image: estebanx55/lasdunasrentacar-ms-security:latest
+    # Remove external port mapping
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mysql-security:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-security:3306/security_db
+      - SPRING_DATASOURCE_USERNAME=serviceuser
+      - SPRING_DATASOURCE_PASSWORD=servicepassword
+    healthcheck:
+      test: "curl --fail --silent localhost:8082/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    extends:
+      file: common-config.yml
+      service: microservices-config
+    networks:
+      - lasdunasrentacar
+
+  ms-rental:
+    image: estebanx55/lasdunasrentacar-ms-rental:latest
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mysql-rental:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-rental:3306/las_rental
+      - SPRING_DATASOURCE_USERNAME=serviceuser
+      - SPRING_DATASOURCE_PASSWORD=servicepassword
+    healthcheck:
+      test: "curl --fail --silent localhost:8081/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    extends:
+      file: common-config.yml
+      service: microservices-config
+    networks:
+      - lasdunasrentacar
+
+  ms-pricing:
+    image: estebanx55/lasdunasrentacar-ms-pricing:latest
+    # Remove external port mapping
+    depends_on:
+      eureka:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8085/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    extends:
+      file: common-config.yml
+      service: microservices-config
+    networks:
+      - lasdunasrentacar
+
+  ms-comments:
+    image: estebanx55/lasdunasrentacar-ms-comment:latest
+    # Remove external port mapping
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb-ms-comments:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://root:rootpassword@mongodb-ms-comments:27017/comments_db?authSource=admin
+    healthcheck:
+      test: "curl --fail --silent localhost:8084/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    extends:
+      file: common-config.yml
+      service: microservices-config
+    networks:
+      - lasdunasrentacar
+
+  gateway:
+    image: estebanx55/lasdunasrentacar-gateway:latest
+    ports:
+      - "8077:8077"  # Only expose gateway externally
+    depends_on:
+      eureka:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8077/actuator/health/readiness | grep UP || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    extends:
+      file: common-config.yml
+      service: microservices-config
+    networks:
+      - lasdunasrentacar
+
+  frontend:
+    build:
+      context: ../Front-Dunas
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      gateway:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:80 || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - lasdunasrentacar
+
+volumes:
+  mongodb-comments-data:
+  mongodb-promotions-data:
+  mysql-security-data:
+  mysql-rental-data:
+
+networks:
+  lasdunasrentacar:
+    driver: bridge
