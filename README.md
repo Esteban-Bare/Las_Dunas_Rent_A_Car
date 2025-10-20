@@ -15,7 +15,7 @@ The application consists of the following components:
 - **Ms-Security** (Port 8082): Authentication and authorization service
 - **Ms-Comments** (Port 8084): Customer reviews and comments management
 - **Ms-Pricing** (Port 8085): Dynamic pricing and rate calculation service
-- **Ms-Promo**: Promotions and discount management service
+- **Ms-Promo**: Promotions and discount management service (in development, not yet deployed)
 
 ### Infrastructure Services
 - **Eureka** (Port 8761): Service discovery and registration
@@ -75,7 +75,7 @@ The easiest way to run the entire application is using Docker Compose:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Esteban-Bare/Las_Dunas_Rent_A_Car.git
+   git clone <repository-url>
    cd Las_Dunas_Rent_A_Car
    ```
 
@@ -169,9 +169,11 @@ The services start in the following order to respect dependencies:
 1. **Databases** (MongoDB, MySQL)
 2. **Config Server**
 3. **Eureka Server**
-4. **Microservices** (Ms-Security, Ms-Rental, Ms-Pricing, Ms-Comments)
+4. **Microservices** (Ms-Security, Ms-Rental, Ms-Pricing, Ms-Comments, Ms-Promo*)
 5. **Gateway**
 6. **Frontend**
+
+*Ms-Promo is currently in development and not included in the Docker Compose deployment.
 
 Each service includes health checks to ensure proper startup sequencing.
 
