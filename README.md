@@ -75,7 +75,7 @@ The easiest way to run the entire application is using Docker Compose:
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone <your-repository-url>  # Replace with the actual repository URL
    cd Las_Dunas_Rent_A_Car
    ```
 
